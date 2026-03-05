@@ -1,3 +1,26 @@
+// Detect mobile and tablet devices by user agent
+if (/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+  // Replace the entire page with a desktop-only message
+  document.body.innerHTML = `
+    <div style="
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      height:100vh;
+      font-family:sans-serif;
+      text-align:center;
+      padding:20px;
+    ">
+      <h2 style="font-size:clamp(1rem, 5vw, 2rem); color:#d32f2f;">
+        Content is accessible only on desktop (PC).
+      </h2>
+    </div>
+  `;
+}
+
+
+
+
 // Global storage
 let defectLogs = [];       // all issues for export
 let groupedErrors = {};    // grouped by rule
@@ -46,8 +69,12 @@ document.getElementById('csvFile').addEventListener('change', function(e) {
       // Count total issues across all rules
       let totalIssues = defectLogs.length;
 
-      // Update status bar
-      document.getElementById('issueCount').textContent = `Total Issues: ${totalIssues}`;
+      // Update status bar with icon + text
+      document.getElementById('issueCount').innerHTML = `
+        <span class="material-icons-outlined me-1" style="font-size:20px;">error_outline</span>
+        <span>Total Issues: ${totalIssues}</span>
+      `;
+
 
 
       // Build tab navigation
@@ -176,12 +203,16 @@ document.getElementById('startBtn').addEventListener('click', function() {
   // Fade in main content
   document.getElementById('mainContent').classList.add('visible');
 
-  // Update status bar text
-  document.getElementById('issueCount').textContent = "Upload DI file (CSV)";
+  // Update status bar with upload icon + text
+  document.getElementById('issueCount').innerHTML = `
+    <span class="material-icons-outlined me-1" style="font-size:20px;">upload_file</span>
+    <span>Upload DI file (CSV)</span>
+  `;
 
   // Hide Start button itself (optional)
   this.style.display = 'none';
 });
+
 
 
 document.getElementById('clearBtn').addEventListener('click', function() {
