@@ -5,8 +5,16 @@ body {
   color: #212529;
 }
 
+body {
+  background-size: cover;   /* scale to fill screen */
+  background-position: center;
+  background-attachment: fixed; /* stays fixed while scrolling */
+  transition: background 0.5s ease; /* smooth fade */
+}
+
 
 #slideshow {
+  background-color: #000;
   position: fixed;
   top: 0; left: 0;
   width: 100%; height: 100%;

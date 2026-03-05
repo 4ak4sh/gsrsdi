@@ -203,6 +203,9 @@ document.getElementById('startBtn').addEventListener('click', function() {
   // Fade in main content
   document.getElementById('mainContent').classList.add('visible');
 
+  // Set background image
+  document.body.style.backgroundImage = "url('./assets/background.png')";
+
   // Update status bar with upload icon + text
   document.getElementById('issueCount').innerHTML = `
     <span class="material-icons-outlined me-1" style="font-size:20px;">upload_file</span>
@@ -212,6 +215,7 @@ document.getElementById('startBtn').addEventListener('click', function() {
   // Hide Start button itself (optional)
   this.style.display = 'none';
 });
+
 
 
 
