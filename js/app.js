@@ -204,7 +204,7 @@ document.getElementById('startBtn').addEventListener('click', function() {
   document.getElementById('mainContent').classList.add('visible');
 
   // Set background image
-  document.body.style.backgroundImage = "url('./assets/background.png')";
+  // document.body.style.backgroundImage = "url('./assets/background.png')";
 
   // Update status bar with upload icon + text
   document.getElementById('issueCount').innerHTML = `
@@ -236,6 +236,7 @@ document.getElementById('clearBtn').addEventListener('click', function() {
   // Optionally show a confirmation alert
   // alert("Validation results cleared!");
 });
+
 
 
 
