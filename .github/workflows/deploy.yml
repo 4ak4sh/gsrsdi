@@ -4,26 +4,31 @@ on:
   push:
     branches: ["main"]
 
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
   contents: read
   pages: write
   id-token: write
+
+# Allow only one concurrent deployment
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
 
 jobs:
   deploy:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Inject Secret into HTML
         run: |
-          # Matches the placeholder in your HTML with your GitHub Secret name
-          sed -i "s/YOUR_SECRET_PLACEHOLDER/${{ secrets.REPLACE_ME_EMAIL }}/g" index.html
+          # This command finds 'REPLACE_ME_EMAIL' in index.html and swaps it for your secret
+          sed -i 's/REPLACE_ME_EMAIL/${{ secrets.REPLACE_ME_EMAIL }}/g' index.html
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
