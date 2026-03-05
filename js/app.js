@@ -177,7 +177,7 @@ document.getElementById('startBtn').addEventListener('click', function() {
   document.getElementById('mainContent').classList.add('visible');
 
   // Update status bar text
-  document.getElementById('issueCount').textContent = "Upload DI file";
+  document.getElementById('issueCount').textContent = "Upload DI file (CSV)";
 
   // Hide Start button itself (optional)
   this.style.display = 'none';
