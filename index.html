@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>GSRS DI Validation Tool v1.0</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+
+  <div id="slideshow">
+    <div class="slide" style="background-image:url('assets/title.png')"></div>
+    <div class="slide" style="background-image:url('assets/bugs.png')"></div>
+  </div>
+
+
+  <!-- Title Bar -->
+<nav id="titleBar" class="navbar fixed-top">
+  <div class="container-fluid">
+    <span class="navbar-brand mb-0 h1">GSRS DI Validation Tool <span style="font-size: medium;">v1.0</span></span>
+    <button id="startBtn" class="btn btn-success rounded-pill fw-bold">
+    Start
+  </button>
+  </div> 
+</nav>
+
+<!-- Spacer so content isn't hidden behind fixed bar -->
+<div style="margin-top:50px;"></div>
+
+
+<div id="mainContent" class="container py-5">
+
+  <div class="card shadow-sm mb-4">
+  <div class="card-body d-flex align-items-end">
+    <!-- File input block -->
+    <div class="flex-grow-1 me-3 d-flex flex-column">
+      <label for="csvFile" class="form-label">Upload CSV File</label>
+      <input type="file" id="csvFile" class="form-control rounded-pill" accept=".csv">
+    </div>
+
+    <!-- Export button aligned to bottom -->
+    <button id="exportBtn" class="btn btn-custom rounded-pill d-flex align-items-center fw-bold">
+    <span class="material-icons fs-4">file_download</span>
+    </button>
+    <button id="clearBtn" class="btn btn-secondary ms-2 rounded-pill d-flex align-items-center fw-bold">
+      <span class="material-icons">refresh</span>
+    </button>
+
+  </div>
+</div>
+
+
+<div class="card shadow-sm">
+    <div class="card-header bg-primary text-white">Validation Results</div>
+    <div class="card-body">
+      <div id="results" class="table-responsive"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Floating Status Bar -->
+<div id="statusBar" class="d-flex justify-content-between align-items-center px-3 py-2 bg-dark text-white">
+  <span id="issueCount">Click start to begin</span>
+  <div class="d-flex align-items-center">
+    <a href="mailto:aakash.subramonian@nielseniq.com?subject=Bug Report - DI Validation Tool" class="text-info text-decoration-none">
+    Report Bugs/Issues
+  </a>
+  <span style="font-size: small;" id="supportText" class="ms-3">Questions or feedback? Contact Aakash</span>
+  </div>
+</div>
+
+
+<!-- Scripts -->
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="libs/papaparse.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script> 
+<script src="js/app.js"></script>
+<script src="js/rules.js"></script>
+<!-- Bootstrap interactivity -->
+</body>
+</html>

@@ -1,0 +1,176 @@
+/* General page styling */
+body {
+  background-color: #f8f9fa;
+  font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: #212529;
+}
+
+#slideshow {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: -1;
+  overflow: hidden;
+}
+
+/* Slideshow fade-out */
+#slideshow {
+  transition: opacity .3s ease-in-out, visibility 2s ease-in-out;
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Hidden state */
+#slideshow.hidden {
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* Main content fade-in */
+#mainContent {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 1s ease-in-out, visibility 1s ease-in-out;
+}
+
+/* Visible state */
+#mainContent.visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+
+#slideshow .slide {
+  position: absolute;
+  width: 100%; height: 100%;
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+  animation: fade 10s infinite;
+}
+
+#slideshow .slide:nth-child(1) {
+  background-image: url('assets/title.png');
+  animation-delay: 0s;
+}
+
+#slideshow .slide:nth-child(2) {
+  background-image: url('assets/bugs.png');
+  animation-delay: 5s;
+}
+
+@keyframes fade {
+  0%, 100% { opacity: 0; }
+  10%, 40% { opacity: 1; }
+}
+
+#startBtn {
+  background-color: #fff;
+  color: #0d6efd;
+}
+
+.btn-custom {
+  background-color: #56d587; 
+  color: #fff;
+}
+
+.btn-custom:hover { 
+  background-color: #4bc579;
+  color: #fff;
+}
+
+/* Title Bar */
+#titleBar {
+  background-color: #0d6efd;
+  height: 60px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+#titleBar .navbar-brand {
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: #fff;
+}
+
+/* Card styling */
+.card {
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.card-header {
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+/* File upload input */
+#csvFile {
+  border-radius: 0.375rem;
+}
+
+/* Tabs navigation */
+.nav-tabs .nav-link {
+  font-weight: 500;
+  color: #495057;
+}
+
+.nav-tabs .nav-link.active {
+  background-color: #0d6efd;
+  color: #fff;
+  border-color: #0d6efd #0d6efd #fff;
+}
+
+/* Tables */
+.table {
+  font-size: 0.9rem;
+}
+
+.table th {
+  font-weight: 600;
+}
+
+.table-danger td {
+  background-color: #f8d7da !important;
+}
+
+.table-warning td {
+  background-color: #fff3cd !important;
+}
+
+/* Floating Status Bar */
+#statusBar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 40px;
+  background-color: #212529;
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 1rem;
+  z-index: 1050;
+  box-shadow: 0 -2px 5px rgba(0,0,0,0.2);
+}
+
+#statusBar #issueCount {
+  font-weight: 600;
+  font-size: .90rem;
+}
+
+#statusBar a {
+  color: #0dcaf0;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+#statusBar a:hover {
+  text-decoration: underline;
+  color: #66d9ef;
+}
+
+.text-info {
+  font-size: .90rem;
+  font-size: small;
+}
