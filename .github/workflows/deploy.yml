@@ -2,7 +2,7 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: ["main"] # Runs every time you push to the main branch
+    branches: ["main"]
 
 permissions:
   contents: read
@@ -11,6 +11,10 @@ permissions:
 
 jobs:
   deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -18,8 +22,8 @@ jobs:
 
       - name: Inject Secret into HTML
         run: |
-          # This replaces "YOUR_SECRET_PLACEHOLDER" with the secret you saved in Step 1
-          sed -i "s/YOUR_SECRET_PLACEHOLDER/${{ secrets.TEAMS_CONTACT_EMAIL }}/g" index.html
+          # Matches the placeholder in your HTML with your GitHub Secret name
+          sed -i "s/YOUR_SECRET_PLACEHOLDER/${{ secrets.REPLACE_ME_EMAIL }}/g" index.html
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
@@ -27,9 +31,8 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: '.' # Uploads everything in your main folder
+          path: '.'
 
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-        
