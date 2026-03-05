@@ -13,6 +13,12 @@ body {
 }
 
 
+/* NO outline at all */
+.card, .tab-pane, .table {
+  border: none;
+}
+
+
 #slideshow {
   background-color: #000;
   position: fixed;
@@ -73,10 +79,19 @@ body {
   10%, 40% { opacity: 1; }
 }
 
+
 #startBtn {
   background-color: #fff;
   color: #0d6efd;
 }
+
+#startBtn:hover {
+  background-color: #418cfc;
+  color: #fff;
+  transform: scale(1.05);       /* slight zoom */
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
 
 .btn-custom {
   background-color: #56d587; 
@@ -100,6 +115,38 @@ body {
   font-size: 1.25rem;
   color: #fff;
 }
+
+/* Toggle buttons for DI / MG & IRT validation */
+.switch-validation-btn {
+  background-color: transparent;
+  border: 1px solid #fff;
+  color: #fff;
+  transition: all 0.3s ease; /* smooth hover animation */
+}
+
+/* Active state (selected) */
+.switch-validation-btn.active {
+  background-color: #fff;
+  color: #0d6efd; /* Bootstrap blue */
+  border: 1px solid #fff;
+}
+
+/* Hover effect for inactive buttons */
+.switch-validation-btn:not(.active):hover {
+  background-color: rgba(255,255,255,0.2); /* faint tint */
+  color: #fff;
+  transform: scale(1.05); /* slight zoom */
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3); /* shadow like Start */
+}
+
+/* Hover effect for active buttons */
+.switch-validation-btn.active:hover {
+  background-color: #e6e6e6; /* light gray when hovered */
+  color: #0d6efd;
+  transform: scale(1.05);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
 
 /* Card styling */
 .card {

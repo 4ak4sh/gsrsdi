@@ -29,12 +29,21 @@
   <!-- Title Bar -->
 <nav id="titleBar" class="navbar fixed-top">
   <div class="container-fluid">
-    <span class="navbar-brand mb-0 h1">GSRS DI Validation Tool <span style="font-size: medium;">v1.0</span></span>
-    <button id="startBtn" class="btn btn-success rounded-pill fw-bold">
-    Start
-  </button>
+    <span class="navbar-brand mb-0 h1">
+      GSRS DI Validation Tool <span style="font-size: medium;">v1.0</span>
+    </span>
+    <div class="d-flex align-items-center">
+      <button id="startBtn" class="btn rounded-pill fw-bold me-2">Start</button>
+      <button id="diBtn" class="btn switch-validation-btn rounded-pill fw-bold me-2" style="display:none;">
+        DI Validation
+      </button>
+      <button id="mgIrtBtn" class="btn switch-validation-btn rounded-pill fw-bold" style="display:none;">
+        MG & IRT Validation
+      </button>
+    </div>
   </div> 
 </nav>
+
 
 <!-- Spacer so content isn't hidden behind fixed bar -->
 <div style="margin-top:50px;"></div>
@@ -70,6 +79,33 @@
   </div>
 </div>
 
+<div id="mgIrtContent" class="container py-5" style="display:none;">
+  <div class="card shadow-sm mb-4">
+    <div class="card-body d-flex align-items-end">
+      <div class="flex-grow-1 me-3 d-flex flex-column">
+        <label for="diFile" class="form-label">Upload DI File</label>
+        <input type="file" id="diFile" class="form-control rounded-pill" accept=".csv">
+      </div>
+      <div class="flex-grow-1 me-3 d-flex flex-column">
+        <label for="mgIrtFile" class="form-label">Upload MG & IRT File</label>
+        <input type="file" id="mgIrtFile" class="form-control rounded-pill" accept=".csv">
+      </div>
+
+      <button id="runValidation" class="btn btn-custom rounded-pill fw-bold">
+        Run Validation
+      </button>
+    </div>
+  </div>
+
+  <div class="card shadow-sm">
+    <div class="card-header bg-success text-white">MG & IRT Validation Results</div>
+    <div class="card-body">
+      <div id="validationResults" class="table-responsive"></div>
+    </div>
+  </div>
+</div>
+
+
 <!-- Floating Status Bar -->
 <div id="statusBar" class="d-flex justify-content-between align-items-center px-3 py-2 bg-dark text-white">
   <span id="issueCount" class="d-flex align-items-center">
@@ -88,12 +124,12 @@
 
 
 <!-- Scripts -->
- <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="libs/papaparse.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script> 
 <script src="js/app.js"></script>
 <script src="js/rules.js"></script>
+<script src="js/mgirt-validation.js"></script>
 <!-- Bootstrap interactivity -->
 </body>
 </html>

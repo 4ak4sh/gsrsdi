@@ -19,6 +19,34 @@ if (/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
 }
 
 
+function setActiveButton(activeId) {
+  const diBtn = document.getElementById('diBtn');
+  const mgIrtBtn = document.getElementById('mgIrtBtn');
+
+  if (activeId === 'diBtn') {
+    diBtn.classList.add('active');
+    mgIrtBtn.classList.remove('active');
+    document.getElementById('mainContent').style.display = 'block';
+    document.getElementById('mgIrtContent').style.display = 'none';
+    document.getElementById('issueCount').innerHTML = `
+      <span class="material-icons-outlined me-1" style="font-size:20px;">upload_file</span>
+      <span>Upload DI file (CSV)</span>
+    `;
+  } else {
+    mgIrtBtn.classList.add('active');
+    diBtn.classList.remove('active');
+    document.getElementById('mainContent').style.display = 'none';
+    document.getElementById('mgIrtContent').style.display = 'block';
+    document.getElementById('issueCount').innerHTML = `
+      <span class="material-icons-outlined me-1" style="font-size:20px;">upload_file</span>
+      <span>Upload DI & MG/IRT files (CSV)</span>
+    `;
+  }
+}
+
+document.getElementById('diBtn').addEventListener('click', () => setActiveButton('diBtn'));
+document.getElementById('mgIrtBtn').addEventListener('click', () => setActiveButton('mgIrtBtn'));
+
 
 
 // Global storage
@@ -26,6 +54,16 @@ let defectLogs = [];       // all issues for export
 let groupedErrors = {};    // grouped by rule
 
 document.getElementById('csvFile').addEventListener('change', function(e) {
+
+  const diFile = e.target.files[0];
+
+  // ✅ Check file type (must be CSV)
+  if (diFile.type !== "text/csv" && !diFile.name.endsWith(".csv")) {
+    alert("Invalid file type. Please upload a CSV file.");
+    this.value = ""; // reset input
+    return;
+  }
+
   Papa.parse(e.target.files[0], {
     header: true,
     complete: function(results) {
@@ -94,7 +132,7 @@ document.getElementById('csvFile').addEventListener('change', function(e) {
 
         content += `
           <div class="tab-pane fade ${first ? 'show active' : ''}" id="${tabId}" role="tabpanel">
-            <table class="table table-bordered table-striped mt-3>
+            <table class="table table-bordered table-striped mt-3">
               <thead class="table-light">
                 <tr>
                   <th>Message</th>
@@ -205,17 +243,29 @@ document.getElementById('startBtn').addEventListener('click', function() {
 
   // Set background image
   document.body.style.backgroundImage = "url('./assets/background.png')";
-
+  
   // Update status bar with upload icon + text
   document.getElementById('issueCount').innerHTML = `
     <span class="material-icons-outlined me-1" style="font-size:20px;">upload_file</span>
     <span>Upload DI file (CSV)</span>
   `;
-
+  
   // Hide Start button itself (optional)
   this.style.display = 'none';
 });
 
+document.getElementById('startBtn').addEventListener('click', () => {
+  document.getElementById('diBtn').style.display = 'inline-block';
+  document.getElementById('mgIrtBtn').style.display = 'inline-block';
+  setActiveButton('diBtn'); // make DI active by default
+});
+
+
+// document.getElementById('runValidation').addEventListener('click', () => {
+//   const diFile = document.getElementById('diFile').files[0];
+//   const mgIrtFile = document.getElementById('mgIrtFile').files[0];
+//   runMgIrtValidation(diFile, mgIrtFile, document.getElementById('validationResults'));
+// });
 
 
 
@@ -226,8 +276,11 @@ document.getElementById('clearBtn').addEventListener('click', function() {
   // Clear results area
   document.getElementById('results').innerHTML = "";
 
-  // Reset issue count
-  document.getElementById('issueCount').textContent = "Total Issues: 0";
+  // Reset status bar text back to upload prompt
+  document.getElementById('issueCount').innerHTML = `
+    <span class="material-icons-outlined me-1" style="font-size:20px;">upload_file</span>
+    <span>Upload DI file (CSV)</span>
+  `;
 
   // Reset global storage
   defectLogs = [];
@@ -237,6 +290,34 @@ document.getElementById('clearBtn').addEventListener('click', function() {
   // alert("Validation results cleared!");
 });
 
+
+document.getElementById('diBtn').addEventListener('click', () => {
+  document.getElementById('mainContent').style.display = 'block';
+  document.getElementById('mgIrtContent').style.display = 'none';
+  document.getElementById('diBtn').classList.add('btn-primary');
+  document.getElementById('diBtn').classList.remove('btn-outline-primary');
+  document.getElementById('mgIrtBtn').classList.add('btn-outline-primary');
+  document.getElementById('mgIrtBtn').classList.remove('btn-primary');
+
+  document.getElementById('issueCount').innerHTML = `
+    <span class="material-icons-outlined me-1" style="font-size:20px;">upload_file</span>
+    <span>Upload DI file (CSV)</span>
+  `;
+});
+
+document.getElementById('mgIrtBtn').addEventListener('click', () => {
+  document.getElementById('mainContent').style.display = 'none';
+  document.getElementById('mgIrtContent').style.display = 'block';
+  document.getElementById('mgIrtBtn').classList.add('btn-primary');
+  document.getElementById('mgIrtBtn').classList.remove('btn-outline-primary');
+  document.getElementById('diBtn').classList.add('btn-outline-primary');
+  document.getElementById('diBtn').classList.remove('btn-primary');
+
+  document.getElementById('issueCount').innerHTML = `
+    <span class="material-icons-outlined me-1" style="font-size:20px;">upload_file</span>
+    <span>Upload DI & MG/IRT files (CSV)</span>
+  `;
+});
 
 
 
