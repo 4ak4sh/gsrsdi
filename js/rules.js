@@ -73,19 +73,19 @@ function checkUVException(row) {
   return { status: "PASS", rule: "UV/Exception", message: "" };
 }
 
-function checkInactive(row) {
-  if (
-    row["Status"] === "[NA] Inactive/Not Verified" &&
-    row["Verification Source"] !== "[13] Special Projects"
-  ) {
-    return {
-      status: "FAIL",
-      rule: "Inactive",
-      message: "Inactive must have Special Projects as VSS",
-    };
-  }
-  return { status: "PASS", rule: "Inactive", message: "" };
-}
+// function checkInactive(row) {
+//   if (
+//     row["Status"] === "[NA] Inactive/Not Verified" &&
+//     row["Verification Source"] !== "[13] Special Projects"
+//   ) {
+//     return {
+//       status: "FAIL",
+//       rule: "Inactive",
+//       message: "Inactive must have Special Projects as VSS",
+//     };
+//   }
+//   return { status: "PASS", rule: "Inactive", message: "" };
+// }
 
 function checkFoodType(row) {
   if (
