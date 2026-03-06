@@ -18,43 +18,43 @@ if (/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
   `;
 }
 
-
 function setActiveButton(activeId) {
-  const diBtn = document.getElementById('diBtn');
-  const mgIrtBtn = document.getElementById('mgIrtBtn');
+  const diBtn = document.getElementById("diBtn");
+  const mgIrtBtn = document.getElementById("mgIrtBtn");
 
-  if (activeId === 'diBtn') {
-    diBtn.classList.add('active');
-    mgIrtBtn.classList.remove('active');
-    document.getElementById('mainContent').style.display = 'block';
-    document.getElementById('mgIrtContent').style.display = 'none';
-    document.getElementById('issueCount').innerHTML = `
+  if (activeId === "diBtn") {
+    diBtn.classList.add("active");
+    mgIrtBtn.classList.remove("active");
+    document.getElementById("mainContent").style.display = "block";
+    document.getElementById("mgIrtContent").style.display = "none";
+    document.getElementById("issueCount").innerHTML = `
       <span class="material-icons-outlined me-1" style="font-size:20px;">upload_file</span>
       <span>Upload DI file (CSV)</span>
     `;
   } else {
-    mgIrtBtn.classList.add('active');
-    diBtn.classList.remove('active');
-    document.getElementById('mainContent').style.display = 'none';
-    document.getElementById('mgIrtContent').style.display = 'block';
-    document.getElementById('issueCount').innerHTML = `
+    mgIrtBtn.classList.add("active");
+    diBtn.classList.remove("active");
+    document.getElementById("mainContent").style.display = "none";
+    document.getElementById("mgIrtContent").style.display = "block";
+    document.getElementById("issueCount").innerHTML = `
       <span class="material-icons-outlined me-1" style="font-size:20px;">upload_file</span>
       <span>Upload DI & MG/IRT files (CSV)</span>
     `;
   }
 }
 
-document.getElementById('diBtn').addEventListener('click', () => setActiveButton('diBtn'));
-document.getElementById('mgIrtBtn').addEventListener('click', () => setActiveButton('mgIrtBtn'));
-
-
+document
+  .getElementById("diBtn")
+  .addEventListener("click", () => setActiveButton("diBtn"));
+document
+  .getElementById("mgIrtBtn")
+  .addEventListener("click", () => setActiveButton("mgIrtBtn"));
 
 // Global storage
-let defectLogs = [];       // all issues for export
-let groupedErrors = {};    // grouped by rule
+let defectLogs = []; // all issues for export
+let groupedErrors = {}; // grouped by rule
 
-document.getElementById('csvFile').addEventListener('change', function(e) {
-
+document.getElementById("csvFile").addEventListener("change", function (e) {
   const diFile = e.target.files[0];
 
   // ✅ Check file type (must be CSV)
@@ -66,7 +66,7 @@ document.getElementById('csvFile').addEventListener('change', function(e) {
 
   Papa.parse(e.target.files[0], {
     header: true,
-    complete: function(results) {
+    complete: function (results) {
       const data = results.data;
 
       // Reset globals
@@ -74,15 +74,15 @@ document.getElementById('csvFile').addEventListener('change', function(e) {
       defectLogs = [];
 
       // Collect errors
-      data.forEach((row,i) => {
-        rules.forEach(rule => {
+      data.forEach((row, i) => {
+        rules.forEach((rule) => {
           const r = rule(row);
           if (r.status !== "PASS") {
             if (!groupedErrors[r.rule]) groupedErrors[r.rule] = [];
             groupedErrors[r.rule].push({
               status: r.status,
               message: r.message,
-              rowData: row
+              rowData: row,
             });
 
             defectLogs.push({
@@ -92,13 +92,19 @@ document.getElementById('csvFile').addEventListener('change', function(e) {
               "GSR Global ID": row["GSR_GLOBAL_ID"] || "",
               "Local Code": row["Local Code"] || "",
               "Store Status": row["Status"] || "",
-              "Name": row["Name"] || "",
-              "Address": row["Address"] || "",
-              "City": row["City"] || "",
-              "State": row["State"] || "",
+              Name: row["Name"] || "",
+              Address: row["Address"] || "",
+              City: row["City"] || "",
+              State: row["State"] || "",
               "Postal Code": row["Postal Code"] || "",
               "Area Code": row["Area Code"] || "",
-              "Phone Number": row["Phone"] || ""
+              "Phone Number": row["Phone"] || "",
+              ...(r.rule === "Verification Date"
+                ? { "Verification Date": row["Verification Date"] || "" }
+                : {}),
+              ...(r.rule === "Verification Source"
+                ? { "Verification Source": row["Verification Source"] || "" }
+                : {}),
             });
           }
         });
@@ -108,12 +114,10 @@ document.getElementById('csvFile').addEventListener('change', function(e) {
       let totalIssues = defectLogs.length;
 
       // Update status bar with icon + text
-      document.getElementById('issueCount').innerHTML = `
+      document.getElementById("issueCount").innerHTML = `
         <span class="material-icons-outlined me-1" style="font-size:20px;">error_outline</span>
         <span>Total Issues: ${totalIssues}</span>
       `;
-
-
 
       // Build tab navigation
       let nav = `<ul class="nav nav-tabs" id="errorTabs" role="tablist">`;
@@ -124,49 +128,69 @@ document.getElementById('csvFile').addEventListener('change', function(e) {
         const tabId = `tab-${idx}`;
         nav += `
           <li class="nav-item" role="presentation">
-            <button class="nav-link ${first ? 'active' : ''}" id="${tabId}-tab" data-bs-toggle="tab" data-bs-target="#${tabId}" type="button" role="tab">
+            <button class="nav-link ${first ? "active" : ""}" id="${tabId}-tab" data-bs-toggle="tab" data-bs-target="#${tabId}" type="button" role="tab">
               ${ruleName} (${groupedErrors[ruleName].length})
             </button>
           </li>
         `;
 
+        let extraHeaders = "";
+        if (ruleName === "Verification Date") {
+          extraHeaders = "<th>Verification Date</th>";
+        } else if (ruleName === "Verification Source") {
+          extraHeaders = "<th>Verification Source</th>";
+        }
+
         content += `
-          <div class="tab-pane fade ${first ? 'show active' : ''}" id="${tabId}" role="tabpanel">
-            <table class="table table-bordered table-striped mt-3">
-              <thead class="table-light">
-                <tr>
-                  <th>Message</th>
-                  <th>GSR Global ID</th>
-                  <th>Local Code</th>
-                  <th>Store Status</th>
-                  <th>Name</th>
-                  <th>Address</th>
-                  <th>City</th>
-                  <th>State</th>
-                  <th>Postal Code</th>
-                  <th>Area Code</th>
-                  <th>Phone Number</th>
-                </tr>
-              </thead>
-              <tbody>
-        `;
-        groupedErrors[ruleName].forEach(err => {
-          const statusClass = err.status === "FAIL" ? "table-danger" : "table-warning";
+  <div class="tab-pane fade ${first ? "show active" : ""}" id="${tabId}" role="tabpanel">
+    <table class="table table-bordered table-striped mt-3">
+      <thead class="table-light">
+        <tr>
+          <th>Message</th>
+          <th>GSR Global ID</th>
+          <th>Local Code</th>
+          <th>Store Status</th>
+          <th>Name</th>
+          <th>Address</th>
+          <th>City</th>
+          <th>State</th>
+          <th>Postal Code</th>
+          <th>Area Code</th>
+          <th>Phone Number</th>
+          ${extraHeaders}
+        </tr>
+      </thead>
+      <tbody>
+`;
+
+        groupedErrors[ruleName].forEach((err) => {
           const r = err.rowData;
+          const statusClass =
+            err.status === "FAIL" ? "table-danger" : "table-warning"; // <-- restore this
+
+          let extraCells = "";
+          if (ruleName === "Verification Date") {
+            extraCells = `<td>${r["Verification Date"] || ""}</td>`;
+          } else if (ruleName === "Verification Source") {
+            extraCells = `<td>${r["Verification Source"] || ""}</td>`;
+          }
+
           content += `<tr class="${statusClass}">
-            <td>${err.message}</td>
-            <td>${r["GSR_GLOBAL_ID"] || ""}</td>
-            <td>${r["Local Code"] || ""}</td>
-            <td>${r["Status"] || ""}</td>
-            <td>${r["Name"] || ""}</td>
-            <td>${r["Address"] || ""}</td>
-            <td>${r["City"] || ""}</td>
-            <td>${r["State"] || ""}</td>
-            <td>${r["Postal Code"] || ""}</td>
-            <td>${r["Area Code"] || ""}</td>
-            <td>${r["Phone"] || ""}</td>
-          </tr>`;
+    <td>${err.message}</td>
+    <td>${r["GSR_GLOBAL_ID"] || ""}</td>
+    <td>${r["Local Code"] || ""}</td>
+    <td>${r["Status"] || ""}</td>
+    <td>${r["Name"] || ""}</td>
+    <td>${r["Address"] || ""}</td>
+    <td>${r["City"] || ""}</td>
+    <td>${r["State"] || ""}</td>
+    <td>${r["Postal Code"] || ""}</td>
+    <td>${r["Area Code"] || ""}</td>
+    <td>${r["Phone"] || ""}</td>
+    ${extraCells}
+  </tr>`;
         });
+
         content += `
               </tbody>
             </table>
@@ -178,19 +202,17 @@ document.getElementById('csvFile').addEventListener('change', function(e) {
       nav += `</ul>`;
       content += `</div>`;
 
-      document.getElementById('results').innerHTML = nav + content;
+      document.getElementById("results").innerHTML = nav + content;
       // Enable sorting for all generated tables
-      document.querySelectorAll('#results table').forEach(tbl => {
+      document.querySelectorAll("#results table").forEach((tbl) => {
         new Tablesort(tbl);
       });
-
-    }
+    },
   });
 });
 
-
 // ✅ Export button handler: separate sheets per defect type
-document.getElementById('exportBtn').addEventListener('click', function() {
+document.getElementById("exportBtn").addEventListener("click", function () {
   if (!groupedErrors || Object.keys(groupedErrors).length === 0) {
     alert("No defect logs to export!");
     return;
@@ -198,8 +220,8 @@ document.getElementById('exportBtn').addEventListener('click', function() {
 
   const workbook = XLSX.utils.book_new();
 
-  Object.keys(groupedErrors).forEach(ruleName => {
-    const rows = groupedErrors[ruleName].map(err => {
+  Object.keys(groupedErrors).forEach((ruleName) => {
+    const rows = groupedErrors[ruleName].map((err) => {
       const r = err.rowData;
       return {
         Rule: ruleName,
@@ -208,58 +230,61 @@ document.getElementById('exportBtn').addEventListener('click', function() {
         "GSR Global ID": r["GSR_GLOBAL_ID"] || "",
         "Local Code": r["Local Code"] || "",
         "Store Status": r["Status"] || "",
-        "Name": r["Name"] || "",
-        "Address": r["Address"] || "",
-        "City": r["City"] || "",
-        "State": r["State"] || "",
+        Name: r["Name"] || "",
+        Address: r["Address"] || "",
+        City: r["City"] || "",
+        State: r["State"] || "",
         "Postal Code": r["Postal Code"] || "",
         "Area Code": r["Area Code"] || "",
-        "Phone Number": r["Phone"] || ""
+        "Phone Number": r["Phone"] || "",
       };
     });
 
     if (rows.length > 0) {
       const worksheet = XLSX.utils.json_to_sheet(rows);
-      XLSX.utils.book_append_sheet(workbook, worksheet, ruleName.substring(0,31));
+      XLSX.utils.book_append_sheet(
+        workbook,
+        worksheet,
+        ruleName.substring(0, 31),
+      );
     }
   });
 
   // Add today’s date to filename
   const today = new Date();
   const yyyy = today.getFullYear();
-  const mm = String(today.getMonth() + 1).padStart(2, '0');
-  const dd = String(today.getDate()).padStart(2, '0');
+  const mm = String(today.getMonth() + 1).padStart(2, "0");
+  const dd = String(today.getDate()).padStart(2, "0");
   const dateStr = `${yyyy}-${mm}-${dd}`;
 
   XLSX.writeFile(workbook, `DefectLogs_${dateStr}.xlsx`);
 });
 
-document.getElementById('startBtn').addEventListener('click', function() {
+document.getElementById("startBtn").addEventListener("click", function () {
   // Fade out slideshow
-  document.getElementById('slideshow').classList.add('hidden');
+  document.getElementById("slideshow").classList.add("hidden");
 
   // Fade in main content
-  document.getElementById('mainContent').classList.add('visible');
+  document.getElementById("mainContent").classList.add("visible");
 
   // Set background image
   document.body.style.backgroundImage = "url('./assets/background.png')";
-  
+
   // Update status bar with upload icon + text
-  document.getElementById('issueCount').innerHTML = `
+  document.getElementById("issueCount").innerHTML = `
     <span class="material-icons-outlined me-1" style="font-size:20px;">upload_file</span>
     <span>Upload DI file (CSV)</span>
   `;
-  
+
   // Hide Start button itself (optional)
-  this.style.display = 'none';
+  this.style.display = "none";
 });
 
-document.getElementById('startBtn').addEventListener('click', () => {
-  document.getElementById('diBtn').style.display = 'inline-block';
-  document.getElementById('mgIrtBtn').style.display = 'inline-block';
-  setActiveButton('diBtn'); // make DI active by default
+document.getElementById("startBtn").addEventListener("click", () => {
+  document.getElementById("diBtn").style.display = "inline-block";
+  document.getElementById("mgIrtBtn").style.display = "inline-block";
+  setActiveButton("diBtn"); // make DI active by default
 });
-
 
 // document.getElementById('runValidation').addEventListener('click', () => {
 //   const diFile = document.getElementById('diFile').files[0];
@@ -267,17 +292,15 @@ document.getElementById('startBtn').addEventListener('click', () => {
 //   runMgIrtValidation(diFile, mgIrtFile, document.getElementById('validationResults'));
 // });
 
-
-
-document.getElementById('clearBtn').addEventListener('click', function() {
+document.getElementById("clearBtn").addEventListener("click", function () {
   // Reset file input
-  document.getElementById('csvFile').value = "";
+  document.getElementById("csvFile").value = "";
 
   // Clear results area
-  document.getElementById('results').innerHTML = "";
+  document.getElementById("results").innerHTML = "";
 
   // Reset status bar text back to upload prompt
-  document.getElementById('issueCount').innerHTML = `
+  document.getElementById("issueCount").innerHTML = `
     <span class="material-icons-outlined me-1" style="font-size:20px;">upload_file</span>
     <span>Upload DI file (CSV)</span>
   `;
@@ -290,35 +313,30 @@ document.getElementById('clearBtn').addEventListener('click', function() {
   // alert("Validation results cleared!");
 });
 
+document.getElementById("diBtn").addEventListener("click", () => {
+  document.getElementById("mainContent").style.display = "block";
+  document.getElementById("mgIrtContent").style.display = "none";
+  document.getElementById("diBtn").classList.add("btn-primary");
+  document.getElementById("diBtn").classList.remove("btn-outline-primary");
+  document.getElementById("mgIrtBtn").classList.add("btn-outline-primary");
+  document.getElementById("mgIrtBtn").classList.remove("btn-primary");
 
-document.getElementById('diBtn').addEventListener('click', () => {
-  document.getElementById('mainContent').style.display = 'block';
-  document.getElementById('mgIrtContent').style.display = 'none';
-  document.getElementById('diBtn').classList.add('btn-primary');
-  document.getElementById('diBtn').classList.remove('btn-outline-primary');
-  document.getElementById('mgIrtBtn').classList.add('btn-outline-primary');
-  document.getElementById('mgIrtBtn').classList.remove('btn-primary');
-
-  document.getElementById('issueCount').innerHTML = `
+  document.getElementById("issueCount").innerHTML = `
     <span class="material-icons-outlined me-1" style="font-size:20px;">upload_file</span>
     <span>Upload DI file (CSV)</span>
   `;
 });
 
-document.getElementById('mgIrtBtn').addEventListener('click', () => {
-  document.getElementById('mainContent').style.display = 'none';
-  document.getElementById('mgIrtContent').style.display = 'block';
-  document.getElementById('mgIrtBtn').classList.add('btn-primary');
-  document.getElementById('mgIrtBtn').classList.remove('btn-outline-primary');
-  document.getElementById('diBtn').classList.add('btn-outline-primary');
-  document.getElementById('diBtn').classList.remove('btn-primary');
+document.getElementById("mgIrtBtn").addEventListener("click", () => {
+  document.getElementById("mainContent").style.display = "none";
+  document.getElementById("mgIrtContent").style.display = "block";
+  document.getElementById("mgIrtBtn").classList.add("btn-primary");
+  document.getElementById("mgIrtBtn").classList.remove("btn-outline-primary");
+  document.getElementById("diBtn").classList.add("btn-outline-primary");
+  document.getElementById("diBtn").classList.remove("btn-primary");
 
-  document.getElementById('issueCount').innerHTML = `
+  document.getElementById("issueCount").innerHTML = `
     <span class="material-icons-outlined me-1" style="font-size:20px;">upload_file</span>
     <span>Upload DI & MG/IRT files (CSV)</span>
   `;
 });
-
-
-
-

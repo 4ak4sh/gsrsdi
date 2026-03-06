@@ -1,13 +1,15 @@
 // Run MG & IRT validation
-document.getElementById('runValidation').addEventListener('click', () => {
-  const diFile = document.getElementById('diFile').files[0];
-  const mgIrtFile = document.getElementById('mgIrtFile').files[0];
-  runMgIrtValidation(diFile, mgIrtFile, document.getElementById('validationResults'));
+document.getElementById("runValidation").addEventListener("click", () => {
+  const diFile = document.getElementById("diFile").files[0];
+  const mgIrtFile = document.getElementById("mgIrtFile").files[0];
+  runMgIrtValidation(
+    diFile,
+    mgIrtFile,
+    document.getElementById("validationResults"),
+  );
 });
 
-
 function runMgIrtValidation(diFile, mgIrtFile, resultsContainer) {
-    
   // ✅ Check if files are selected
   if (!diFile || !mgIrtFile) {
     alert("Please upload both DI and MG/IRT files.");
@@ -21,19 +23,23 @@ function runMgIrtValidation(diFile, mgIrtFile, resultsContainer) {
   }
 
   Promise.all([
-    new Promise(resolve => Papa.parse(diFile, { header: true, complete: r => resolve(r.data) })),
-    new Promise(resolve => Papa.parse(mgIrtFile, { header: true, complete: r => resolve(r.data) }))
+    new Promise((resolve) =>
+      Papa.parse(diFile, { header: true, complete: (r) => resolve(r.data) }),
+    ),
+    new Promise((resolve) =>
+      Papa.parse(mgIrtFile, { header: true, complete: (r) => resolve(r.data) }),
+    ),
   ]).then(([diData, mgIrtData]) => {
     let matches = [];
 
-    diData.forEach(diRow => {
+    diData.forEach((diRow) => {
       const diName = (diRow["Name"] || "").trim();
       const mgLocalCode = (diRow["MG Local Code"] || "").trim();
 
       // ✅ Only check rows where MG Local Code is blank
       if (!diName || mgLocalCode) return;
 
-      mgIrtData.forEach(mgRow => {
+      mgIrtData.forEach((mgRow) => {
         const mgName = (mgRow["ACCOUNT_NAME"] || "").trim();
         if (!mgName) return;
 
@@ -44,7 +50,7 @@ function runMgIrtValidation(diFile, mgIrtFile, resultsContainer) {
             diName,
             mgName,
             mgId: mgRow["TDLINX_ACCOUNT_CODE"] || "",
-            irtId: mgRow["ACC_IMMEDIATE_REPORT_TO" || ""]
+            irtId: mgRow["ACC_IMMEDIATE_REPORT_TO" || ""],
           });
         }
       });
@@ -63,14 +69,18 @@ function runMgIrtValidation(diFile, mgIrtFile, resultsContainer) {
           </tr>
         </thead>
         <tbody>
-          ${matches.map(m => `
+          ${matches
+            .map(
+              (m) => `
             <tr class="table-success">
               <td>${m.diId}</td>
               <td>${m.diName}</td>
               <td>${m.mgName}</td>
               <td>${m.mgId}</td>
               <td>${m.irtId}</td>
-            </tr>`).join("")}
+            </tr>`,
+            )
+            .join("")}
         </tbody>
       </table>
     `;

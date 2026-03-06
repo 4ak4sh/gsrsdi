@@ -6,31 +6,35 @@ body {
 }
 
 body {
-  background-size: cover;   /* scale to fill screen */
+  background-size: cover; /* scale to fill screen */
   background-position: center;
   background-attachment: fixed; /* stays fixed while scrolling */
   transition: background 0.5s ease; /* smooth fade */
 }
 
-
 /* NO outline at all */
-.card, .tab-pane, .table {
+.card,
+.tab-pane,
+.table {
   border: none;
 }
-
 
 #slideshow {
   background-color: #000;
   position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   z-index: -1;
   overflow: hidden;
 }
 
 /* Slideshow fade-out */
 #slideshow {
-  transition: opacity .3s ease-in-out, visibility 2s ease-in-out;
+  transition:
+    opacity 0.3s ease-in-out,
+    visibility 2s ease-in-out;
   opacity: 1;
   visibility: visible;
 }
@@ -45,7 +49,9 @@ body {
 #mainContent {
   opacity: 0;
   visibility: hidden;
-  transition: opacity 1s ease-in-out, visibility 1s ease-in-out;
+  transition:
+    opacity 1s ease-in-out,
+    visibility 1s ease-in-out;
 }
 
 /* Visible state */
@@ -54,10 +60,10 @@ body {
   visibility: visible;
 }
 
-
 #slideshow .slide {
   position: absolute;
-  width: 100%; height: 100%;
+  width: 100%;
+  height: 100%;
   background-size: cover;
   background-position: center;
   opacity: 0;
@@ -65,20 +71,25 @@ body {
 }
 
 #slideshow .slide:nth-child(1) {
-  background-image: url('assets/title.png');
+  background-image: url("assets/title.png");
   animation-delay: 0s;
 }
 
 #slideshow .slide:nth-child(2) {
-  background-image: url('assets/bugs.png');
+  background-image: url("assets/bugs.png");
   animation-delay: 5s;
 }
 
 @keyframes fade {
-  0%, 100% { opacity: 0; }
-  10%, 40% { opacity: 1; }
+  0%,
+  100% {
+    opacity: 0;
+  }
+  10%,
+  40% {
+    opacity: 1;
+  }
 }
-
 
 #startBtn {
   background-color: #fff;
@@ -88,17 +99,16 @@ body {
 #startBtn:hover {
   background-color: #418cfc;
   color: #fff;
-  transform: scale(1.05);       /* slight zoom */
-  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  transform: scale(1.05); /* slight zoom */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
 
-
 .btn-custom {
-  background-color: #56d587; 
+  background-color: #56d587;
   color: #fff;
 }
 
-.btn-custom:hover { 
+.btn-custom:hover {
   background-color: #4bc579;
   color: #fff;
 }
@@ -107,7 +117,7 @@ body {
 #titleBar {
   background-color: #0d6efd;
   height: 60px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 #titleBar .navbar-brand {
@@ -133,10 +143,10 @@ body {
 
 /* Hover effect for inactive buttons */
 .switch-validation-btn:not(.active):hover {
-  background-color: rgba(255,255,255,0.2); /* faint tint */
+  background-color: rgba(255, 255, 255, 0.2); /* faint tint */
   color: #fff;
   transform: scale(1.05); /* slight zoom */
-  box-shadow: 0 4px 10px rgba(0,0,0,0.3); /* shadow like Start */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* shadow like Start */
 }
 
 /* Hover effect for active buttons */
@@ -144,9 +154,8 @@ body {
   background-color: #e6e6e6; /* light gray when hovered */
   color: #0d6efd;
   transform: scale(1.05);
-  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
-
 
 /* Card styling */
 .card {
@@ -207,12 +216,12 @@ body {
   align-items: center;
   padding: 0 1rem;
   z-index: 1050;
-  box-shadow: 0 -2px 5px rgba(0,0,0,0.2);
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2);
 }
 
 #statusBar #issueCount {
   font-weight: 600;
-  font-size: .90rem;
+  font-size: 0.9rem;
 }
 
 #statusBar a {
@@ -227,6 +236,6 @@ body {
 }
 
 .text-info {
-  font-size: .90rem;
+  font-size: 0.9rem;
   font-size: small;
 }
