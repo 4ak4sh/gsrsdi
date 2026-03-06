@@ -277,7 +277,6 @@ const rules = [
   checkVerificationDate,
   checkVerificationSource,
   checkUVException,
-  checkInactive,
   checkFoodType,
   checkPhone,
   checkAddress,
