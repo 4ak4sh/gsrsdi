@@ -114,14 +114,52 @@
 </span>
 
   <div class="d-flex align-items-center">
-    <a href="mailto:aakash.subramonian@nielseniq.com?subject=Bug Report - DI Validation Tool" class="text-info text-decoration-none">
-    <span class="material-icons-outlined me-.5 align-middle" style= "font-size: 19px;">bug_report</span>
-    <span class="align-middle">Report Bugs/Issues</span>
+    <a href="#" class="text-info text-decoration-none" data-bs-toggle="modal" data-bs-target="#bugReportModal">
+      <span class="material-icons-outlined me-.5 align-middle" style="font-size: 19px;">bug_report</span>
+      <span class="align-middle">Report Bugs/Issues</span>
     </a>
     <span style="font-size: small;" id="supportText" class="ms-3">Questions or feedback? Contact Aakash</span>
   </div>
 </div>
 
+
+<!-- Bug Report Modal -->
+<div class="modal fade" id="bugReportModal" tabindex="-1" aria-labelledby="bugReportModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form action="https://formspree.io/f/xzdjpnya" method="POST" enctype="multipart/form-data">
+        <div class="modal-header">
+          <h5 class="modal-title" id="bugReportModalLabel">Report a Bug</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="userEmail" class="form-label">Your Email</label>
+            <input type="email" class="form-control" id="userEmail" name="email" required>
+          </div>
+
+          <div class="mb-3">
+            <label for="bugMessage" class="form-label">Describe the issue</label>
+            <textarea class="form-control" id="bugMessage" name="message" rows="4" required></textarea>
+          </div>
+
+          <!-- File upload field -->
+          <div class="mb-3">
+            <label for="bugFile" class="form-label">Attach a file (CSV or image)</label>
+            <input type="file" class="form-control" id="bugFile" name="file"
+                   accept=".csv,image/*">
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary rounded-pill">Submit Report</button>
+          <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
 
 <!-- Scripts -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -133,5 +171,3 @@
 <!-- Bootstrap interactivity -->
 </body>
 </html>
-
-
