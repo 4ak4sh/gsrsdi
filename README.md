@@ -14,3 +14,10 @@ A lightweight, responsive web tool for validating CSV data with clear error repo
 ## 🛠️ Tech Stack
 - **Frontend**: HTML, CSS, Bootstrap
 - **Logic**: JavaScript (modular validation pipeline)
+
+---
+
+## 📜 License
+Copyright (c) 2026 Aakash  
+All rights reserved.  
+This software is proprietary and confidential. Unauthorized use, copying, modification, or distribution is strictly prohibited.
