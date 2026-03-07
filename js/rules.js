@@ -55,6 +55,41 @@ function checkVerificationSource(row) {
   return { status: "PASS", rule: "Verification Source", message: "" };
 }
 
+function checkEmMgException(row) {
+  const trade = row["Local Trade Channel"] || "";
+  const mgName = row["MG Name"] || "";
+  const exception = row["Exception Code"] || "";
+
+  if (trade === "[59] Unknown On-Premise") {
+    if (mgName.endsWith("/EM")) {
+      if (exception !== "777794Z") {
+        return {
+          status: "FAIL",
+          rule: "EM/MG Exception",
+          message: `/EM MG must have Exception Code 94Z`
+        };
+      }
+    }
+  }
+
+  return { status: "PASS", rule: "EM/MG Exception", message: "" };
+}
+
+
+function checkInactive(row) {
+  if (row["Status"] === "[NA] Inactive/Not Verified") {
+    if (row["Exception Code"] !== "777798Z") {
+      return {
+        status: "FAIL",
+        rule: "Inactive/Exception",
+        message: "Inactive must have Exception Code 98Z"
+      };
+    }
+  }
+  return { status: "PASS", rule: "Inactive/Exception", message: "" };
+}
+
+
 function checkUVException(row) {
   if (row["Status"] === "[UV] Unverifiable") {
     if (row["Exception Code"] !== "777793Z")
@@ -73,38 +108,49 @@ function checkUVException(row) {
   return { status: "PASS", rule: "UV/Exception", message: "" };
 }
 
-// function checkInactive(row) {
-//   if (
-//     row["Status"] === "[NA] Inactive/Not Verified" &&
-//     row["Verification Source"] !== "[13] Special Projects"
-//   ) {
-//     return {
-//       status: "FAIL",
-//       rule: "Inactive",
-//       message: "Inactive must have Special Projects as VSS",
-//     };
-//   }
-//   return { status: "PASS", rule: "Inactive", message: "" };
-// }
-
-function checkFoodType(row) {
-  if (
-    ["[50] Dining", "[51] Bar/Nightclub", "[55] Caterers", ""].includes(
-      row["Local Trade Channel"],
-    ) ||
-    ["[H] Restaurant NA", "[C] Concessionaire NA"].includes(
-      row["Local Sub Channel"],
-    )
-  ) {
-    if (isNull(row["Food Type"]))
+function checkUVTrade(row) {
+  if (row["Status"] === "[UV] Unverifiable") {
+    if (!(row["Local Trade Channel"] === "[09] Unknown Retailers" &&
+          row["Local Sub Channel"] === "[X] Retail Other")) {
       return {
         status: "FAIL",
-        rule: "Food Type",
-        message: "Food Type missing for On Premise TD",
+        rule: "UV/Trade",
+        message: "UV must be [09] Unknown Retailers / [X] Retail Other"
       };
+    }
   }
+  return { status: "PASS", rule: "UV/Trade", message: "" };
+}
+
+
+function checkFoodType(row) {
+  // Skip completely empty rows
+  // if (Object.values(row).every(val => val === null || val === "")) {
+  //   return { status: "PASS", rule: "Food Type", message: "" };
+  // }
+
+  const status = row["Status"] || "";
+  const tradeChannel = row["Local Trade Channel"] || "";
+  const subChannel = row["Local Sub Channel"] || "";
+  const foodType = row["Food Type"];
+
+  const validTradeChannels = ["[50] Dining", "[51] Bar/Nightclub", "[55] Caterers", ""];
+  const validSubChannels = ["[H] Restaurant NA", "[C] Concessionaire NA"];
+
+  if (validTradeChannels.includes(tradeChannel) || validSubChannels.includes(subChannel)) {
+    if (isNull(foodType)) {
+      if (status === "[OP] Open, Operating" || status === "[FO] Future Opening") {
+        return { status: "FAIL", rule: "Food Type", message: "Food Type missing for On Premise TD" };
+      } else {
+        return { status: "WARN", rule: "Food Type", message: "Food Type missing for On Premise TD" };
+      }
+    }
+  }
+
   return { status: "PASS", rule: "Food Type", message: "" };
 }
+
+
 
 function checkPhone(row) {
   const status = row["Status"];
@@ -130,12 +176,123 @@ function checkPhone(row) {
 function checkAddress(row) {
   if (row["Address Quality"] === "Non Standardized")
     return {
-      status: "WARNING",
-      rule: "Address",
+      status: "WARN",
+      rule: "Address Quality",
       message: "Address not standardized",
     };
-  return { status: "PASS", rule: "Address", message: "" };
+  return { status: "PASS", rule: "Address Quality", message: "" };
 }
+
+// Full names → required abbreviations
+const POSTAL_ABBREVIATIONS = {
+  "Avenue": "Ave",
+  "Boulevard": "Blvd",
+  "Building": "Bldg",
+  "Business Highway": "Bus Hwy",
+  "Bypass": "Byp",
+  "Causeway": "Cswy",
+  "Center": "Ctr",
+  "Circle": "Cir",
+  "County Road": "Co Rd",
+  "Court": "Ct",
+  "Drive": "Dr",
+  "Expressway": "Expy",
+  "Extension": "Ext",
+  "Farm To Market": "FM",
+  "Freeway": "Fwy",
+  "Highway": "Hwy",
+  "Interstate": "I",
+  "Lane": "Ln",
+  "Lake": "Lk",
+  "Mount": "Mt",
+  "Park": "Pk",
+  "Parkway": "Pkwy",
+  "Pike": "Pke",
+  "Place": "Pl",
+  "Plaza": "Plz",
+  "Point": "Pt",
+  "Port": "Pt",
+  "Route": "Rte",
+  "Rural Route": "RR",
+  "Square": "Sq",
+  "State Highway": "St Hwy",
+  "Street": "St",
+  "Suite": "Ste",
+  "Terrace": "Ter",
+  "Trail": "Trl",
+  "Turnpike": "Tpke",
+  "US Highway": "US Hwy",
+  "Way": "Way"
+};
+
+// Full directionals → required abbreviations
+const DIRECTIONALS = {
+  "North": "N",
+  "South": "S",
+  "East": "E",
+  "West": "W",
+  "Northeast": "NE",
+  "Southeast": "SE",
+  "Northwest": "NW",
+  "Southwest": "SW"
+};
+
+// Full numbered streets → abbreviations
+const NUMBERED_STREETS = {
+  "First": "1st",
+  "Second": "2nd",
+  "Third": "3rd",
+  "Fourth": "4th"
+};
+
+function checkAddressRules(row) {
+  const address = row["Address"] || "";
+  const quality = row["Address Quality"] || "";
+
+  // ✅ Only run rules if address is NOT standardized
+  if (quality !== "Non Standardized") {
+    return { status: "PASS", rule: "Address Rule", message: "" };
+  }
+
+  let errors = [];
+
+  // Rule 1: No special characters except & and /
+  if (/[^a-zA-Z0-9\s&\/]/.test(address)) {
+    errors.push("Address contains invalid special characters");
+  }
+
+  // Rule 2: Must NOT contain full street names (should be abbreviations)
+  for (const [full, abbr] of Object.entries(POSTAL_ABBREVIATIONS)) {
+    const regex = new RegExp(`\\b${full}\\b`, "i");
+    if (regex.test(address)) {
+      errors.push(`"${full}" should be "${abbr}"`);
+    }
+  }
+
+  // Rule 3: Must NOT contain full directionals (should be abbreviations)
+  for (const [full, abbr] of Object.entries(DIRECTIONALS)) {
+    const regex = new RegExp(`\\b${full}\\b`, "i");
+    if (regex.test(address)) {
+      errors.push(`"${full}" should be "${abbr}"`);
+    }
+  }
+
+  // Rule 4: Must NOT contain full numbered street names
+  for (const [full, abbr] of Object.entries(NUMBERED_STREETS)) {
+    const regex = new RegExp(`\\b${full}\\b`, "i");
+    if (regex.test(address)) {
+      errors.push(`"${full}" should be "${abbr}"`);
+    }
+  }
+
+  if (errors.length > 0) {
+    return { status: "FAIL", rule: "Address Rule", message: errors.join("; ") };
+  }
+
+  return { status: "PASS", rule: "Address Rule", message: "" };
+}
+
+
 
 function checkNameFormat(row) {
   const name = (row["Name"] || "").trim();
@@ -276,9 +433,13 @@ function incorrectSupplier(row) {
 const rules = [
   checkVerificationDate,
   checkVerificationSource,
+  checkEmMgException,
+  checkInactive,
   checkUVException,
+  checkUVTrade,
   checkFoodType,
   checkPhone,
+  checkAddressRules,
   checkAddress,
   checkNameFormat,
   nullSupplier,

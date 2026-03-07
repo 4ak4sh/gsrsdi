@@ -1,7 +1,7 @@
 /* General page styling */
 body {
   background-color: #f8f9fa;
-  font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family: 'DM Sans', sans-serif;
   color: #212529;
 }
 
@@ -112,6 +112,80 @@ body {
   background-color: #4bc579;
   color: #fff;
 }
+
+/* Base button setup */
+#exportBtn, #clearBtn {
+  display: inline-flex;       /* shrink-wrap to content */
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;            /* fits icon only */
+  transition: padding 0.3s ease, width 0.3s ease;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+/* Add hidden text via ::after */
+#exportBtn::after {
+  content: "Export";          /* no leading space */
+  opacity: 0;
+  max-width: 0;               /* collapse completely */
+  overflow: hidden;
+  margin-left: 0;             /* no spacing when hidden */
+  transition: max-width 0.3s ease, opacity 0.3s ease, margin-left 0.3s ease;
+}
+
+#clearBtn::after {
+  content: "Clear";
+  opacity: 0;
+  max-width: 0;
+  overflow: hidden;
+  margin-left: 0;
+  transition: max-width 0.3s ease, opacity 0.3s ease, margin-left 0.3s ease;
+}
+
+/* Reveal text smoothly on hover */
+#exportBtn:hover::after,
+#clearBtn:hover::after {
+  opacity: 1;
+  max-width: 100px;           /* expand to fit text */
+  margin-left: 0.3rem;        /* spacing appears only when visible */
+  margin-right: 0.25rem;
+}
+
+/* Active (pressed) style */
+#exportBtn:active {
+  background-color: #41a668; /* slightly darker shade */
+  color: #fff;
+}
+
+/* Animate the icon when button is active (clicked) */
+#exportBtn:active .material-icons,
+#clearBtn:active .material-icons {
+  animation: iconClick 0.3s ease;
+}
+
+@keyframes iconClick {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(0.85); } /* shrink slightly */
+  100% { transform: scale(1); }    /* return to normal */
+}
+
+#runValidation:active {
+  background-color: #4bc579; /* slightly darker shade */
+  color: #fff;
+}
+
+#runValidation:active .material-icons {
+  animation: validateBounce 0.5s ease;
+}
+
+@keyframes validateBounce {
+  0%   { transform: translateY(0); }
+  30%  { transform: translateY(-6px); } /* move up */
+  60%  { transform: translateY(3px); }  /* move down */
+  100% { transform: translateY(0); }    /* back to normal */
+}
+
 
 /* Title Bar */
 #titleBar {

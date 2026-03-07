@@ -1,289 +1,176 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>GSRS DI Validation Tool v1.0</title>
-    <!-- Standard favicon -->
-    <link rel="icon" type="image/png" href="assets/favicon.png" />
 
-    <!-- Optional sizes for better support -->
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="32x32"
-      href="assets/favicon-32x32.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="16x16"
-      href="assets/favicon-16x16.png"
-    />
+<head>
+  <meta charset="UTF-8" />
+  <title>GSRS DI Validation v1.0</title>
+  <!-- Standard favicon -->
+  <link rel="icon" type="image/png" href="assets/favicon.png" />
 
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
-    />
-    <link
-      href="https://fonts.googleapis.com/icon?family=Material+Icons"
-      rel="stylesheet"
-    />
-    <link
-      href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="css/style.css" />
-  </head>
+  <!-- Optional sizes for better support -->
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png" />
 
-  <body>
-    <div id="slideshow">
-      <div
-        class="slide"
-        style="background-image: url(&quot;assets/title.png&quot;)"
-      ></div>
-      <div
-        class="slide"
-        style="background-image: url(&quot;assets/bugs.png&quot;)"
-      ></div>
-    </div>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"  />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons"  />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined"  />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
 
-    <!-- Title Bar -->
-    <nav id="titleBar" class="navbar fixed-top">
-      <div class="container-fluid">
-        <span class="navbar-brand mb-0 h1">
-          GSRS DI Validation Tool <span style="font-size: medium">v1.0</span>
-        </span>
-        <div class="d-flex align-items-center">
-          <button id="startBtn" class="btn rounded-pill fw-bold me-2">
-            Start
-          </button>
-          <button
-            id="diBtn"
-            class="btn switch-validation-btn rounded-pill fw-bold me-2"
-            style="display: none"
-          >
-            DI Validation
-          </button>
-          <button
-            id="mgIrtBtn"
-            class="btn switch-validation-btn rounded-pill fw-bold"
-            style="display: none"
-          >
-            MG & IRT Validation
-          </button>
-        </div>
-      </div>
-    </nav>
+<body>
+  <div id="slideshow">
+    <div class="slide" style="background-image: url(&quot;assets/title.png&quot;)"></div>
+    <div class="slide" style="background-image: url(&quot;assets/bugs.png&quot;)"></div>
+  </div>
 
-    <!-- Spacer so content isn't hidden behind fixed bar -->
-    <div style="margin-top: 50px"></div>
-
-    <div id="mainContent" class="container py-5">
-      <div class="card shadow-sm mb-4">
-        <div class="card-body d-flex align-items-end">
-          <!-- File input block -->
-          <div class="flex-grow-1 me-3 d-flex flex-column">
-            <label for="csvFile" class="form-label">Upload CSV File</label>
-            <input
-              type="file"
-              id="csvFile"
-              class="form-control rounded-pill"
-              accept=".csv"
-            />
-          </div>
-
-          <!-- Export button aligned to bottom -->
-          <button
-            id="exportBtn"
-            class="btn btn-custom rounded-pill d-flex align-items-center fw-bold"
-          >
-            <span class="material-icons fs-4">file_download</span>
-          </button>
-          <button
-            id="clearBtn"
-            class="btn btn-secondary ms-2 rounded-pill d-flex align-items-center fw-bold"
-          >
-            <span class="material-icons">refresh</span>
-          </button>
-        </div>
-      </div>
-
-      <div class="card shadow-sm">
-        <div class="card-header bg-primary text-white">Validation Results</div>
-        <div class="card-body">
-          <div id="results" class="table-responsive"></div>
-        </div>
-      </div>
-    </div>
-
-    <div id="mgIrtContent" class="container py-5" style="display: none">
-      <div class="card shadow-sm mb-4">
-        <div class="card-body d-flex align-items-end">
-          <div class="flex-grow-1 me-3 d-flex flex-column">
-            <label for="diFile" class="form-label">Upload DI File</label>
-            <input
-              type="file"
-              id="diFile"
-              class="form-control rounded-pill"
-              accept=".csv"
-            />
-          </div>
-          <div class="flex-grow-1 me-3 d-flex flex-column">
-            <label for="mgIrtFile" class="form-label"
-              >Upload MG & IRT File</label
-            >
-            <input
-              type="file"
-              id="mgIrtFile"
-              class="form-control rounded-pill"
-              accept=".csv"
-            />
-          </div>
-
-          <button
-            id="runValidation"
-            class="btn btn-custom rounded-pill fw-bold"
-          >
-            Run Validation
-          </button>
-        </div>
-      </div>
-
-      <div class="card shadow-sm">
-        <div class="card-header bg-success text-white">
-          MG & IRT Validation Results
-        </div>
-        <div class="card-body">
-          <div id="validationResults" class="table-responsive"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Floating Status Bar -->
-    <div
-      id="statusBar"
-      class="d-flex justify-content-between align-items-center px-3 py-2 bg-dark text-white"
-    >
-      <span id="issueCount" class="d-flex align-items-center">
-        <span class="material-icons-outlined me-1" style="font-size: 20px"
-          >info</span
-        >
-        <span>Click start to begin</span>
+  <!-- Title Bar -->
+  <nav id="titleBar" class="navbar fixed-top">
+    <div class="container-fluid">
+      <span class="navbar-brand mb-0 h1" style="font-family: Montserrat;">
+        GSRS DI Validation <span style="font-size: small; font-weight: lighter;">v1.0</span>
       </span>
-
       <div class="d-flex align-items-center">
-        <a
-          href="#"
-          class="text-info text-decoration-none"
-          data-bs-toggle="modal"
-          data-bs-target="#bugReportModal"
-        >
-          <span
-            class="material-icons-outlined me-.5 align-middle"
-            style="font-size: 19px"
-            >bug_report</span
-          >
-          <span class="align-middle">Report Bugs/Issues</span>
-        </a>
-        <span style="font-size: small" id="supportText" class="ms-3"
-          >Questions or feedback? Contact Aakash</span
-        >
+        <button id="startBtn" class="btn rounded-pill fw-bold me-2">
+          Start
+        </button>
+        <button id="diBtn" class="btn switch-validation-btn rounded-pill fw-bold me-2" style="display: none">
+          DI Validation
+        </button>
+        <button id="mgIrtBtn" class="btn switch-validation-btn rounded-pill fw-bold" style="display: none">
+          MG & IRT Validation
+        </button>
       </div>
     </div>
+  </nav>
 
-    <!-- Bug Report Modal -->
-    <div
-      class="modal fade"
-      id="bugReportModal"
-      tabindex="-1"
-      aria-labelledby="bugReportModalLabel"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <form
-            action="https://formspree.io/f/xzdjpnya"
-            method="POST"
-            enctype="multipart/form-data"
-          >
-            <div class="modal-header">
-              <h5 class="modal-title" id="bugReportModalLabel">Report a Bug</h5>
-              <button
-                type="button"
-                class="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-              ></button>
-            </div>
+  <!-- Spacer so content isn't hidden behind fixed bar -->
+  <div style="margin-top: 50px"></div>
 
-            <div class="modal-body">
-              <div class="mb-3">
-                <label for="userEmail" class="form-label">Your Email</label>
-                <input
-                  type="email"
-                  class="form-control"
-                  id="userEmail"
-                  name="email"
-                  required
-                />
-              </div>
-
-              <div class="mb-3">
-                <label for="bugMessage" class="form-label"
-                  >Describe the issue</label
-                >
-                <textarea
-                  class="form-control"
-                  id="bugMessage"
-                  name="message"
-                  rows="4"
-                  required
-                ></textarea>
-              </div>
-
-              <!-- File upload field -->
-              <div class="mb-3">
-                <label for="bugFile" class="form-label"
-                  >Attach a file (CSV or image)</label
-                >
-                <input
-                  type="file"
-                  class="form-control"
-                  id="bugFile"
-                  name="file"
-                  accept=".csv,image/*"
-                />
-              </div>
-            </div>
-
-            <div class="modal-footer">
-              <button type="submit" class="btn btn-primary rounded-pill">
-                Submit Report
-              </button>
-              <button
-                type="button"
-                class="btn btn-secondary rounded-pill"
-                data-bs-dismiss="modal"
-              >
-                Cancel
-              </button>
-            </div>
-          </form>
+  <div id="mainContent" class="container py-5">
+    <div class="card shadow-sm mb-4">
+      <div class="card-body d-flex align-items-end">
+        <!-- File input block -->
+        <div class="flex-grow-1 me-3 d-flex flex-column">
+          <label for="csvFile" class="form-label">Upload DI File</label>
+          <input type="file" id="csvFile" class="form-control rounded-pill" accept=".csv" />
         </div>
+
+        <!-- Export button aligned to bottom -->
+        <button id="exportBtn" class="btn btn-custom rounded-pill d-flex align-items-center fw-bold">
+          <span class="material-icons fs-4">file_download</span>
+        </button>
+        <button id="clearBtn" class="btn btn-secondary ms-2 rounded-pill d-flex align-items-center fw-bold">
+          <span class="material-icons fs-4">refresh</span>
+        </button>
       </div>
     </div>
 
-    <!-- Scripts -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="js/app.js"></script>
-    <script src="js/rules.js"></script>
-    <script src="js/mgirt-validation.js"></script>
-    <!-- Bootstrap interactivity -->
-  </body>
+    <div class="card shadow-sm">
+      <div class="card-header bg-primary text-white">Validation Results</div>
+      <div class="card-body">
+        <div id="results" class="table-responsive"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="mgIrtContent" class="container py-5" style="display: none">
+    <div class="card shadow-sm mb-4">
+      <div class="card-body d-flex align-items-end">
+        <div class="flex-grow-1 me-3 d-flex flex-column">
+          <label for="diFile" class="form-label">Upload DI File</label>
+          <input type="file" id="diFile" class="form-control rounded-pill" accept=".csv" />
+        </div>
+        <div class="flex-grow-1 me-3 d-flex flex-column">
+          <label for="mgIrtFile" class="form-label">Upload MG & IRT File</label>
+          <input type="file" id="mgIrtFile" class="form-control rounded-pill" accept=".csv" />
+        </div>
+
+        <button id="runValidation" class="btn btn-custom rounded-pill fw-bold d-flex align-items-center gap-1">
+          <span class="material-icons">check_circle</span>
+          Validate
+        </button>
+      </div>
+    </div>
+
+    <div class="card shadow-sm">
+      <div class="card-header bg-success text-white">
+        MG & IRT Validation Results
+      </div>
+      <div class="card-body">
+        <div id="validationResults" class="table-responsive"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating Status Bar -->
+  <div id="statusBar" class="d-flex justify-content-between align-items-center px-3 py-2 bg-dark text-white">
+    <span id="issueCount" class="d-flex align-items-center">
+      <span class="material-icons-outlined me-1" style="font-size: 20px">info</span>
+      <span>Click start to begin</span>
+    </span>
+
+    <div class="d-flex align-items-center">
+      <a href="#" class="text-info text-decoration-none" data-bs-toggle="modal" data-bs-target="#bugReportModal">
+        <span class="material-icons-outlined me-.5 align-middle" style="font-size: 19px">bug_report</span>
+        <span class="align-middle">Report Bugs/Issues</span>
+      </a>
+      <span style="font-size: small" id="supportText" class="ms-3">Questions or feedback? Contact Aakash</span>
+    </div>
+  </div>
+
+  <!-- Bug Report Modal -->
+  <div class="modal fade" id="bugReportModal" tabindex="-1" aria-labelledby="bugReportModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form action="https://formspree.io/f/xzdjpnya" method="POST" enctype="multipart/form-data">
+          <div class="modal-header">
+            <h5 class="modal-title" id="bugReportModalLabel">Report a Bug</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="userEmail" class="form-label">Your Email</label>
+              <input type="email" class="form-control" id="userEmail" name="email" required />
+            </div>
+
+            <div class="mb-3">
+              <label for="bugMessage" class="form-label">Describe the issue</label>
+              <textarea class="form-control" id="bugMessage" name="message" rows="4" required></textarea>
+            </div>
+
+            <!-- File upload field -->
+            <div class="mb-3">
+              <label for="bugFile" class="form-label">Attach a file (CSV or image)</label>
+              <input type="file" class="form-control" id="bugFile" name="file" accept=".csv,image/*" />
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-primary rounded-pill">
+              Submit Report
+            </button>
+            <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/rules.js"></script>
+  <script src="js/mgirt-validation.js"></script>
+  <!-- Bootstrap interactivity -->
+</body>
+
 </html>

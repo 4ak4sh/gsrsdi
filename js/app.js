@@ -66,6 +66,7 @@ document.getElementById("csvFile").addEventListener("change", function (e) {
 
   Papa.parse(e.target.files[0], {
     header: true,
+    skipEmptyLines: true,
     complete: function (results) {
       const data = results.data;
 
@@ -165,8 +166,13 @@ document.getElementById("csvFile").addEventListener("change", function (e) {
 
         groupedErrors[ruleName].forEach((err) => {
           const r = err.rowData;
-          const statusClass =
-            err.status === "FAIL" ? "table-danger" : "table-warning"; // <-- restore this
+          let statusClass = "";
+          if (err.status === "FAIL") {
+            statusClass = "table-danger";   // 🔴 red
+          } else if (err.status === "WARN") {
+            statusClass = "table-warning";  // 🟡 yellow
+          }
+
 
           let extraCells = "";
           if (ruleName === "Verification Date") {
@@ -203,16 +209,23 @@ document.getElementById("csvFile").addEventListener("change", function (e) {
       content += `</div>`;
 
       document.getElementById("results").innerHTML = nav + content;
-      // Enable sorting for all generated tables
-      document.querySelectorAll("#results table").forEach((tbl) => {
-        new Tablesort(tbl);
-      });
+      
     },
   });
 });
 
 // ✅ Export button handler: separate sheets per defect type
 document.getElementById("exportBtn").addEventListener("click", function () {
+
+  function safeSheetName(name) {
+  // Replace forbidden characters with underscore and trim to 31 chars
+  return name.replace(/[:\\/?*\[\]]/g, "_").substring(0, 31);
+}
+  
+  console.log("export button clicked")
+  console.log("Grouped Errors:", groupedErrors);
+
+
   if (!groupedErrors || Object.keys(groupedErrors).length === 0) {
     alert("No defect logs to export!");
     return;
@@ -224,8 +237,6 @@ document.getElementById("exportBtn").addEventListener("click", function () {
     const rows = groupedErrors[ruleName].map((err) => {
       const r = err.rowData;
       return {
-        Rule: ruleName,
-        Status: err.status,
         Message: err.message,
         "GSR Global ID": r["GSR_GLOBAL_ID"] || "",
         "Local Code": r["Local Code"] || "",
@@ -237,18 +248,22 @@ document.getElementById("exportBtn").addEventListener("click", function () {
         "Postal Code": r["Postal Code"] || "",
         "Area Code": r["Area Code"] || "",
         "Phone Number": r["Phone"] || "",
+        "Verification Date": r["Verification Date"] || "",
+        "Verification Source": r["Verification Source"] || ""
       };
     });
 
     if (rows.length > 0) {
       const worksheet = XLSX.utils.json_to_sheet(rows);
-      XLSX.utils.book_append_sheet(
-        workbook,
-        worksheet,
-        ruleName.substring(0, 31),
-      );
+      XLSX.utils.book_append_sheet(workbook, worksheet, safeSheetName(ruleName));
     }
   });
+
+  // Fallback if no sheets
+  if (workbook.SheetNames.length === 0) {
+    const ws = XLSX.utils.aoa_to_sheet([["No defects found"]]);
+    XLSX.utils.book_append_sheet(workbook, ws, "Summary");
+  }
 
   // Add today’s date to filename
   const today = new Date();
@@ -257,8 +272,9 @@ document.getElementById("exportBtn").addEventListener("click", function () {
   const dd = String(today.getDate()).padStart(2, "0");
   const dateStr = `${yyyy}-${mm}-${dd}`;
 
-  XLSX.writeFile(workbook, `DefectLogs_${dateStr}.xlsx`);
+  XLSX.writeFile(workbook, `DI_DefectLogs_${dateStr}.xlsx`);
 });
+
 
 document.getElementById("startBtn").addEventListener("click", function () {
   // Fade out slideshow
@@ -307,7 +323,7 @@ document.getElementById("clearBtn").addEventListener("click", function () {
 
   // Reset global storage
   defectLogs = [];
-  groupedErrors = [];
+  groupedErrors = {};
 
   // Optionally show a confirmation alert
   // alert("Validation results cleared!");

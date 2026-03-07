@@ -47,6 +47,7 @@ function runMgIrtValidation(diFile, mgIrtFile, resultsContainer) {
         if (diName.toLowerCase() === mgName.toLowerCase()) {
           matches.push({
             diId: diRow["Local Code"] || "",
+            diStatus: diRow["Status"],
             diName,
             mgName,
             mgId: mgRow["TDLINX_ACCOUNT_CODE"] || "",
@@ -63,6 +64,7 @@ function runMgIrtValidation(diFile, mgIrtFile, resultsContainer) {
           <tr>
             <th>Local Code (as per DI sheet)</th>
             <th>Name (as per DI sheet)</th>
+            <th>Store Status</th>
             <th>MG/IRT Account Name</th>
             <th>MG Account ID</th>
             <th>IRT Account ID</th>
@@ -75,6 +77,7 @@ function runMgIrtValidation(diFile, mgIrtFile, resultsContainer) {
             <tr class="table-success">
               <td>${m.diId}</td>
               <td>${m.diName}</td>
+              <td>${m.diStatus}</td>
               <td>${m.mgName}</td>
               <td>${m.mgId}</td>
               <td>${m.irtId}</td>
