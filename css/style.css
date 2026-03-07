@@ -114,7 +114,7 @@ body {
 }
 
 /* Base button setup */
-#exportBtn, #clearBtn {
+#exportBtn, #clearBtn, #mgIrtclearBtn {
   display: inline-flex;       /* shrink-wrap to content */
   align-items: center;
   justify-content: center;
@@ -126,15 +126,16 @@ body {
 
 /* Add hidden text via ::after */
 #exportBtn::after {
-  content: "Export";          /* no leading space */
+  content: "Export";
   opacity: 0;
-  max-width: 0;               /* collapse completely */
+  max-width: 0;
   overflow: hidden;
-  margin-left: 0;             /* no spacing when hidden */
+  margin-left: 0;
   transition: max-width 0.3s ease, opacity 0.3s ease, margin-left 0.3s ease;
 }
 
-#clearBtn::after {
+#clearBtn::after,
+#mgIrtclearBtn::after {
   content: "Clear";
   opacity: 0;
   max-width: 0;
@@ -145,12 +146,14 @@ body {
 
 /* Reveal text smoothly on hover */
 #exportBtn:hover::after,
-#clearBtn:hover::after {
+#clearBtn:hover::after,
+#mgIrtclearBtn:hover::after {
   opacity: 1;
-  max-width: 100px;           /* expand to fit text */
-  margin-left: 0.3rem;        /* spacing appears only when visible */
+  max-width: 100px;
+  margin-left: 0.3rem;
   margin-right: 0.25rem;
 }
+
 
 /* Active (pressed) style */
 #exportBtn:active {

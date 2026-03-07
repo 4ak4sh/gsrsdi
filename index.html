@@ -10,7 +10,7 @@
   <!-- Optional sizes for better support -->
   <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png" />
   <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png" />
-
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"  />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons"  />
@@ -85,13 +85,16 @@
           <input type="file" id="diFile" class="form-control rounded-pill" accept=".csv" />
         </div>
         <div class="flex-grow-1 me-3 d-flex flex-column">
-          <label for="mgIrtFile" class="form-label">Upload MG & IRT File (<span id="mgStatus" class="text-success fw-bold"></span>)</label>
+          <label for="mgIrtFile" class="form-label">Upload MG & IRT File <span id="mgStatus" class="text-success fw-bold"></span></label>
           <input type="file" id="mgIrtFile" class="form-control rounded-pill" accept=".csv" />
         </div>
 
         <button id="runValidation" class="btn btn-custom rounded-pill fw-bold d-flex align-items-center gap-1">
           <span class="material-icons">check_circle</span>
           Validate
+        </button>
+        <button id="mgIrtclearBtn" class="btn btn-secondary rounded-pill fw-bold d-flex align-items-center ms-2">
+          <span class="material-icons">refresh</span>
         </button>
       </div>
     </div>
