@@ -1,6 +1,6 @@
 # DI Validation Tool
 
-A lightweight, responsive web tool for validating CSV data with clear error reporting and modular rule logic.
+A lightweight, responsive web tool for validating CSV data with clear error reporting and modular rule logic (as per org needs).
 
 ---
 
