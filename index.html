@@ -60,19 +60,21 @@
         </div>
 
         <!-- Export button aligned to bottom -->
-        <button id="exportBtn" class="btn btn-custom rounded-pill d-flex align-items-center fw-bold">
-          <span class="material-icons fs-4">file_download</span>
-        </button>
-        <button id="clearBtn" class="btn btn-secondary ms-2 rounded-pill d-flex align-items-center fw-bold">
+        <button id="clearBtn" class="btn btn-secondary rounded-pill d-flex align-items-center fw-bold">
           <span class="material-icons fs-4">refresh</span>
+        </button>
+        <button id="exportBtn" class="btn btn-custom rounded-pill d-flex align-items-center fw-bold ms-2">
+          <span class="material-icons fs-4">file_download</span>
         </button>
       </div>
     </div>
 
     <div class="card shadow-sm">
-      <div class="card-header bg-primary text-white">Validation Results</div>
+      <div id="diCardHead" class="card-header bg-secondary text-white">DI Validation - Defect Log</div>
       <div class="card-body">
-        <div id="results" class="table-responsive"></div>
+        <div id="results" class="table-responsive">
+          Upload DI file to display defects
+        </div>
       </div>
     </div>
   </div>
@@ -85,26 +87,29 @@
           <input type="file" id="diFile" class="form-control rounded-pill" accept=".csv" />
         </div>
         <div class="flex-grow-1 me-3 d-flex flex-column">
-          <label for="mgIrtFile" class="form-label">Upload MG & IRT File <span id="mgStatus" class="text-success fw-bold"></span></label>
+          <label for="mgIrtFile" class="form-label "><span id="mgStatus" class="text-success"></span></label>
           <input type="file" id="mgIrtFile" class="form-control rounded-pill" accept=".csv" />
         </div>
-
-        <button id="runValidation" class="btn btn-custom rounded-pill fw-bold d-flex align-items-center gap-1">
-          <span class="material-icons">check_circle</span>
-          Validate
-        </button>
-        <button id="mgIrtclearBtn" class="btn btn-secondary rounded-pill fw-bold d-flex align-items-center ms-2">
-          <span class="material-icons">refresh</span>
-        </button>
+        <div class="d-flex flex-wrap gap-2">
+          <button id="mgIrtclearBtn" class="btn btn-secondary rounded-pill fw-bold d-flex align-items-center">
+            <span class="material-icons">refresh</span>
+          </button>
+          <button id="runValidation" class="btn btn-custom rounded-pill fw-bold d-flex align-items-center gap-1">
+            <span class="material-icons">check_circle</span>
+            Validate
+          </button>
+        </div>
       </div>
     </div>
 
     <div class="card shadow-sm">
-      <div class="card-header bg-success text-white">
-        MG & IRT Validation Results
+      <div id="mgIrtCardHead" class="card-header bg-secondary text-white">
+        MG & IRT Validation - Match Log
       </div>
       <div class="card-body">
-        <div id="validationResults" class="table-responsive"></div>
+        <div id="validationResults" class="table-responsive">
+          Upload DI file and click validate to display matches
+        </div>
       </div>
     </div>
   </div>

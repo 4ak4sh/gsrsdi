@@ -19,7 +19,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     if (error) {
       console.error("Error loading MG/IRT data:", error);
       statusEl.innerHTML =
-        '<span class="badge bg-danger rounded-pill"><i class="bi bi-x-circle-fill me-1"></i>Error loading MG & IRT data</span>';
+        '<span class="badge bg-danger rounded-pill"><i class="bi bi-x-circle-fill me-1"></i>Error loading MG & IRT list from database! Please upload your file</span>';
       return null;
     }
     if (data && data.length > 0) {
@@ -28,7 +28,7 @@ window.addEventListener("DOMContentLoaded", async () => {
       return data;
     } else {
       statusEl.innerHTML =
-        '<span class="badge bg-warning text-dark rounded-pill"><i class="bi bi-exclamation-circle-fill me-1"></i>No MG & IRT data in database</span>';
+        '<span class="badge bg-warning text-dark rounded-pill"><i class="bi bi-exclamation-circle-fill me-1"></i>No MG & IRT data in database! Please upload your file</span>';
       return null;
     }
   }
@@ -67,6 +67,11 @@ window.addEventListener("DOMContentLoaded", async () => {
       alert("Please upload the DI file.");
       return;
     }
+    if (diFile.type !== "text/csv" && !diFile.name.endsWith(".csv")) {
+      alert("Invalid file type. Please upload a CSV file.");
+      this.value = ""; // reset input
+      return;
+    }
     if (cachedMgIrtData) {
       runMgIrtValidation(diFile, cachedMgIrtData, resultsContainer);
     } else {
@@ -80,14 +85,22 @@ window.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("diFile").value = "";
     mgIrtFile.value = "";
 
+    // Change card header color
+    document.getElementById("mgIrtCardHead").classList.remove("bg-primary")
+    document.getElementById("mgIrtCardHead").classList.add("bg-secondary")
+
     // Clear results
-    resultsContainer.innerHTML = "";
+    resultsContainer.innerHTML = "Upload DI file and click validate to display matches";
 
     // Reload MG/IRT data from database
     cachedMgIrtData = await loadMgIrtDataFromSupabase();
   });
 
   function runMgIrtValidation(diFile, mgIrtData, resultsContainer) {
+
+    document.getElementById("mgIrtCardHead").classList.remove("bg-secondary")
+    document.getElementById("mgIrtCardHead").classList.add("bg-primary")
+
     Papa.parse(diFile, {
       header: true,
       complete: (r) => {
@@ -146,7 +159,7 @@ window.addEventListener("DOMContentLoaded", async () => {
                   ? matches
                       .map(
                         (m) => `
-                    <tr class="table-success">
+                    <tr class="table-warning">
                       <td>${m.diId}</td>
                       <td>${m.diName}</td>
                       <td>${m.diStatus}</td>

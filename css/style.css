@@ -154,6 +154,17 @@ body {
   margin-right: 0.25rem;
 }
 
+#mgIrtclearBtn {
+  min-width: 40px;          /* ensures icon always fits */
+  flex-shrink: 0;           /* don’t let it collapse */
+}
+
+@media (max-width: 576px) { /* Bootstrap’s “sm” breakpoint */
+  #mgIrtclearBtn::after {
+    display: none;          /* hide the hover text on very small screens */
+  }
+}
+
 
 /* Active (pressed) style */
 #exportBtn:active {
@@ -163,7 +174,8 @@ body {
 
 /* Animate the icon when button is active (clicked) */
 #exportBtn:active .material-icons,
-#clearBtn:active .material-icons {
+#clearBtn:active .material-icons,
+#mgIrtclearBtn:active .material-icons {
   animation: iconClick 0.3s ease;
 }
 

@@ -111,6 +111,9 @@ document.getElementById("csvFile").addEventListener("change", function (e) {
         });
       });
 
+      document.getElementById("diCardHead").classList.remove("bg-secondary")
+      document.getElementById("diCardHead").classList.add("bg-primary")
+
       // Count total issues across all rules
       let totalIssues = defectLogs.length;
 
@@ -312,8 +315,11 @@ document.getElementById("clearBtn").addEventListener("click", function () {
   // Reset file input
   document.getElementById("csvFile").value = "";
 
+  document.getElementById("diCardHead").classList.remove("bg-primary")
+  document.getElementById("diCardHead").classList.add("bg-secondary")
+
   // Clear results area
-  document.getElementById("results").innerHTML = "";
+  document.getElementById("results").innerHTML = "Upload DI file to display defects";
 
   // Reset status bar text back to upload prompt
   document.getElementById("issueCount").innerHTML = `
