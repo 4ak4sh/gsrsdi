@@ -175,7 +175,13 @@ window.addEventListener("DOMContentLoaded", async () => {
           </table>
         `;
         resultsContainer.innerHTML = html;
+
+        // ✅ Show modal only if matches exist
+        if (matches.length > 0) {
+          const modal = new bootstrap.Modal(document.getElementById("verifyModal"));
+          modal.show();
+        }
       },
     });
-  }
+  } 
 });
