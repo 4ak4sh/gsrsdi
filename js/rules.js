@@ -222,7 +222,7 @@ const POSTAL_ABBREVIATIONS = {
   "Trail": "Trl",
   "Turnpike": "Tpke",
   "US Highway": "US Hwy",
-  "Way": "Way"
+  "Wy": "Way"
 };
 
 // Full directionals → required abbreviations
