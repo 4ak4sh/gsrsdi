@@ -435,6 +435,9 @@ function incorrectSupplier(row) {
   const gmsupp = (row["GM Supplier Number"] || "").trim();
   const hbcsupp = (row["HBC Supplier Number"] || "").trim();
   const frozensupp = (row["Frozen Supplier Number"] || "").trim();
+
+  const irt = (row["IRT Local Code"] || "").trim();
+  const mg = (row["MG Local Code"] || "").trim();
   const trade = (row["Local Trade Channel"] || "").trim();
 
   // Helper: check if any supplier field is populated
@@ -448,18 +451,32 @@ function incorrectSupplier(row) {
     "[05] Grocery Stores",
   ];
 
-  // ❌ If trade is not allowed but suppliers exist → FAIL
+  // --- Step 1: IRT/MG rule ---
+  if (!irt && !mg) {
+    if (hasSupplier) {
+      return {
+        status: "FAIL",
+        rule: "Incorrect Supplier",
+        message: "Suppliers must not be populated when both IRT and MG are empty",
+      };
+    }
+    // If no suppliers → PASS immediately
+    return { status: "PASS", rule: "Incorrect Supplier", message: "" };
+  }
+
+  // --- Step 2: Trade rule (only runs if Step 1 passed) ---
   if (!allowedTrades.includes(trade) && hasSupplier) {
     return {
       status: "FAIL",
       rule: "Incorrect Supplier",
-      message: `Trade ${trade} should not have any supplier fields populated`,
+      message: `Trade ${trade} should not have supplier fields populated`,
     };
   }
 
   // ✅ Otherwise → PASS
   return { status: "PASS", rule: "Incorrect Supplier", message: "" };
 }
+
 
 // Export rules
 const rules = [
