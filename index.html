@@ -122,11 +122,16 @@
     </span>
 
     <div class="d-flex align-items-center">
-      <a href="#" class="text-info text-decoration-none" data-bs-toggle="modal" data-bs-target="#bugReportModal">
+      <a href="#" class="text-info text-decoration-none ms-3" data-bs-toggle="modal" data-bs-target="#bugReportModal">
         <span class="material-icons-outlined me-.5 align-middle" style="font-size: 19px">bug_report</span>
         <span class="align-middle">Report Bugs/Issues</span>
       </a>
-      <span style="font-size: small" id="supportText" class="ms-3">Questions or feedback? Contact Aakash</span>
+      <a href="#" class="text-info text-decoration-none ms-3" data-bs-toggle="modal" data-bs-target="#issuesModal">
+        <span class="material-icons-outlined me-.5 align-middle" style="font-size: 19px">construction</span>
+        <span class="align-middle">Existing Bugs</span>
+      </a>  
+      
+      <span style="font-size: small" id="supportText" class="ms-3">Questions or feedback? Contact <b>Aakash</b></span>
     </div>
   </div>
 
@@ -151,6 +156,27 @@
       </div>
     </div>
   </div>
+
+  <!-- GitHub Issues Modal -->
+  <div class="modal fade" id="issuesModal" tabindex="-1" aria-labelledby="issuesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="issuesModalLabel">Existing Bugs/Issues</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <ul id="githubIssuesList" class="list-group small">
+            <li class="list-group-item">Loading issues...</li>
+          </ul>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>  
+
 
 
   <!-- Bug Report Modal -->

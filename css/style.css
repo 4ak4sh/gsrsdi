@@ -201,6 +201,17 @@ body {
   100% { transform: translateY(0); }    /* back to normal */
 }
 
+#githubIssuesList .list-group-item {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.3s ease;
+}
+
+#githubIssuesList .list-group-item.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 
 /* Title Bar */
 #titleBar {

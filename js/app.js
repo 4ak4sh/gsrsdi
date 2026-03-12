@@ -18,6 +18,62 @@ if (/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
   `;
 }
 
+// Update Github Issues Modal
+
+document.addEventListener("DOMContentLoaded", () => {
+  const issuesList = document.getElementById("githubIssuesList");
+  const issuesModal = document.getElementById("issuesModal");
+
+  let cachedIssues = null;   // local memory
+  let lastFetched = null;
+
+  async function loadIssues() {
+    // If cached and fetched within last 5 minutes, reuse
+    if (cachedIssues && (Date.now() - lastFetched < 5 * 60 * 1000)) {
+      renderIssues(cachedIssues);
+      return;
+    }
+
+    try {
+      const response = await fetch("https://api.github.com/repos/4ak4sh/gsrsdi/issues");
+      cachedIssues = await response.json();
+      lastFetched = Date.now();
+      renderIssues(cachedIssues);
+    } catch (err) {
+      issuesList.innerHTML = "<li class='list-group-item text-danger'>Failed to load issues</li>";
+      console.error("Error fetching issues:", err);
+    }
+  }
+
+  function renderIssues(issues) {
+    issuesList.innerHTML = "";
+    if (issues.length === 0) {
+      issuesList.innerHTML = "<li class='list-group-item'>No issues found</li>";
+      return;
+    }
+    issues.forEach((issue, index) => {
+      const li = document.createElement("li");
+      li.className = "list-group-item d-flex justify-content-between align-items-center";
+      li.innerHTML = `
+        <a href="${issue.html_url}" target="_blank" class="text-decoration-none">
+          #${issue.number} ${issue.title}
+        </a>
+        <span class="badge rounded-pill fw-bold text-uppercase bg-${issue.state === "open" ? "warning" : "success"}">
+          ${issue.state === "open" ? "UNDER FIXING" : "FIXED"}
+        </span>
+      `;
+      issuesList.appendChild(li);
+
+      // staggered animation using index
+      setTimeout(() => li.classList.add("show"), 100 * index);
+    });
+
+  }
+
+  issuesModal.addEventListener("show.bs.modal", loadIssues);
+});
+
+
 function setActiveButton(activeId) {
   const diBtn = document.getElementById("diBtn");
   const mgIrtBtn = document.getElementById("mgIrtBtn");
