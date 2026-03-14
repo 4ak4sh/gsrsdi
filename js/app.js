@@ -35,7 +35,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     try {
-      const response = await fetch("https://api.github.com/repos/4ak4sh/gsrsdi/issues");
+      const response = await fetch("https://api.github.com/repos/4ak4sh/gsrsdi/issues?state=all");
       cachedIssues = await response.json();
       lastFetched = Date.now();
       renderIssues(cachedIssues);
