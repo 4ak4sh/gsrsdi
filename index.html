@@ -137,25 +137,26 @@
 
 
   <!-- Modal -->
-  <div class="modal fade" id="verifyModal" tabindex="-1" aria-labelledby="verifyModalLabel" aria-hidden="true">
+  <div class="modal fade" id="verifyModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title d-flex align-items-center" id="verifyModalLabel">
-            <span class="material-icons text-warning me-2">error</span>
-            Important Notice
-          </h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <h5 class="modal-title">Important Notice</h5>
+          <!-- No close button here initially -->
         </div>
         <div class="modal-body">
-          Matches are based on comparison only. Please confirm the business’s official website before updating MG & IRT in TD.
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">Close</button>
+          <!-- Default state: spinner -->
+          <div class="d-flex align-items-center">
+            <div class="spinner-border text-primary me-2" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+            <span>Matching DI file against MG/IRT database...</span>
+          </div>
         </div>
       </div>
     </div>
   </div>
+
 
   <!-- GitHub Issues Modal -->
   <div class="modal fade" id="issuesModal" tabindex="-1" aria-labelledby="issuesModalLabel" aria-hidden="true">
