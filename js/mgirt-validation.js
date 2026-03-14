@@ -1,3 +1,4 @@
+// with cache feature
 window.addEventListener("DOMContentLoaded", async () => {
   const statusEl = document.getElementById("mgStatus");
   const mgIrtFile = document.getElementById("mgIrtFile");
@@ -11,7 +12,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     "sb_publishable_C7dnz0Y4hzyM8gtSXdp5ig_WLfOHiox"
   );
 
-  // ✅ Normalizers
+    // ✅ Normalizers
   function normalizeName(name) {
     return (name || "")
       .toLowerCase()
@@ -65,7 +66,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  // ✅ Load MG/IRT data once at page load
+    // ✅ Cache MG/IRT data once at startup
   let mgIrtData = await loadMgIrtDataFromSupabase();
 
   // ✅ Allow user upload as override
@@ -77,14 +78,15 @@ window.addEventListener("DOMContentLoaded", async () => {
         complete: (r) => {
           statusEl.innerHTML =
             '<span class="badge bg-success rounded-pill"><i class="bi bi-check-circle-fill me-1"></i>Using uploaded MG & IRT file</span>';
-          runMgIrtValidation(document.getElementById("diFile").files[0], r.data, resultsContainer);
+          // override cached data
+          mgIrtData = r.data;
+          runMgIrtValidation(document.getElementById("diFile").files[0], mgIrtData, resultsContainer);
         },
       });
     }
   });
 
-  // ✅ Run MG & IRT validation
-  runValidationBtn.addEventListener("click", async () => {
+    runValidationBtn.addEventListener("click", async () => {
     const diFile = document.getElementById("diFile").files[0];
     if (!diFile) {
       alert("Please upload the DI file.");
@@ -94,6 +96,11 @@ window.addEventListener("DOMContentLoaded", async () => {
       alert("Invalid file type. Please upload a CSV file.");
       return;
     }
+
+    // ✅ Reset modal header each time
+    const modalContent = document.querySelector("#verifyModal .modal-content");
+    const existingHeader = modalContent.querySelector(".modal-header");
+    if (existingHeader) existingHeader.remove();
 
     // ✅ Reset modal body to spinner before showing
     const modalBody = document.querySelector("#verifyModal .modal-body");
@@ -106,130 +113,128 @@ window.addEventListener("DOMContentLoaded", async () => {
       </div>
     `;
 
-    // ✅ Remove any old close button
-    const modalHeader = document.querySelector("#verifyModal .modal-header");
-    const oldClose = modalHeader.querySelector(".btn-close");
-    if (oldClose) oldClose.remove();
-
-    // ✅ Open modal
-    const modal = new bootstrap.Modal(document.getElementById("verifyModal"));
+    // ✅ Open modal in locked mode (loading state)
+    const modalEl = document.getElementById("verifyModal");
+    let modal = new bootstrap.Modal(modalEl, {
+      backdrop: "static",
+      keyboard: false
+    });
     modal.show();
 
-    // ✅ Always refresh MG/IRT data before validation
-    const mgIrtData = await loadMgIrtDataFromSupabase();
+    // ✅ Use cached MG/IRT data
     if (!mgIrtData) {
       alert("MG & IRT data not available. Please upload or check database.");
       return;
     }
 
-    
-      
-    // Run validation
-      Papa.parse(diFile, {
-        header: true,
-        complete: (r) => {
-          const diData = r.data;
-          let matches = [];
+        Papa.parse(diFile, {
+      header: true,
+      complete: (r) => {
+        const diData = r.data;
+        let matches = [];
 
-          // Build lookup maps
-          const mgMapByName = new Map();
-          const mgMapByCode = new Map();
+        // Build lookup maps
+        const mgMapByName = new Map();
+        const mgMapByCode = new Map();
 
-          mgIrtData.forEach((row) => {
-            const normName = normalizeName(row["ACCOUNT_NAME"]);
-            const normCode = normalizeCode(row["TDLINX_ACCOUNT_CODE"]);
-            if (normName) mgMapByName.set(normName, row);
-            if (normCode) mgMapByCode.set(normCode, row);
-          });
+        mgIrtData.forEach((row) => {
+          const normName = normalizeName(row["ACCOUNT_NAME"]);
+          const normCode = normalizeCode(row["TDLINX_ACCOUNT_CODE"]);
+          if (normName) mgMapByName.set(normName, row);
+          if (normCode) mgMapByCode.set(normCode, row);
+        });
 
-          diData.forEach((diRow) => {
-            const diName = (diRow["Name"] || "").trim();
-            const diNameNorm = normalizeName(diName);
-            const mgLocalCodeNorm = normalizeCode(diRow["MG Local Code"]);
-            const irtLocalCode = (diRow["IRT Local Code"] || "").trim();
+        diData.forEach((diRow) => {
+          const diName = (diRow["Name"] || "").trim();
+          const diNameNorm = normalizeName(diName);
+          const mgLocalCodeNorm = normalizeCode(diRow["MG Local Code"]);
+          const irtLocalCode = (diRow["IRT Local Code"] || "").trim();
 
-            // Case A: Both MG + IRT missing → match by name
-            if (!mgLocalCodeNorm && !irtLocalCode && diNameNorm && mgMapByName.has(diNameNorm)) {
-              const mgRow = mgMapByName.get(diNameNorm);
-              if (mgRow["ACC_IMMEDIATE_REPORT_TO"]) { // skip if null
-                matches.push({
-                  diId: diRow["Local Code"],
-                  diName,
-                  diStatus: diRow["Status"],
-                  mgName: mgRow["ACCOUNT_NAME"],
-                  mgId: mgRow["TDLINX_ACCOUNT_CODE"],
-                  irtId: mgRow["ACC_IMMEDIATE_REPORT_TO"],
-                });
-              }
+          if (!mgLocalCodeNorm && !irtLocalCode && diNameNorm && mgMapByName.has(diNameNorm)) {
+            const mgRow = mgMapByName.get(diNameNorm);
+            if (mgRow["ACC_IMMEDIATE_REPORT_TO"]) {
+              matches.push({
+                diId: diRow["Local Code"],
+                diName,
+                diStatus: diRow["Status"],
+                mgName: mgRow["ACCOUNT_NAME"],
+                mgId: mgRow["TDLINX_ACCOUNT_CODE"],
+                irtId: mgRow["ACC_IMMEDIATE_REPORT_TO"],
+              });
             }
+          } else if (mgLocalCodeNorm && !irtLocalCode) {
+            const mgRowByCode = mgMapByCode.get(mgLocalCodeNorm);
+            const mgRowByName = mgMapByName.get(diNameNorm);
+            const mgRow = mgRowByCode || mgRowByName;
 
-            // Case B: MG present but IRT missing → lookup by MG code, fallback by name
-            else if (mgLocalCodeNorm && !irtLocalCode) {
-              const mgRowByCode = mgMapByCode.get(mgLocalCodeNorm);
-              const mgRowByName = mgMapByName.get(diNameNorm);
-              const mgRow = mgRowByCode || mgRowByName;
-
-              if (mgRow && mgRow["ACC_IMMEDIATE_REPORT_TO"]) { // skip if null
-                matches.push({
-                  diId: diRow["Local Code"],
-                  diName,
-                  diStatus: diRow["Status"],
-                  mgName: mgRow["ACCOUNT_NAME"],
-                  mgId: mgRow["TDLINX_ACCOUNT_CODE"],
-                  irtId: mgRow["ACC_IMMEDIATE_REPORT_TO"],
-                });
-              }
+            if (mgRow && mgRow["ACC_IMMEDIATE_REPORT_TO"]) {
+              matches.push({
+                diId: diRow["Local Code"],
+                diName,
+                diStatus: diRow["Status"],
+                mgName: mgRow["ACCOUNT_NAME"],
+                mgId: mgRow["TDLINX_ACCOUNT_CODE"],
+                irtId: mgRow["ACC_IMMEDIATE_REPORT_TO"],
+              });
             }
-          });
+          }
+        });
 
-          setTimeout(()=> {
-            // ✅ Update modal body after results
-            modalBody.innerHTML = `
-              Matches are based on comparison only. Please confirm the business’s official website before updating MG & IRT in TD.
+        setTimeout(() => {
+          modalBody.innerHTML = `
+            Matches are based on comparison only. Please confirm the business’s official website before updating MG & IRT in TD.
+          `;
+          const modalContent = document.querySelector("#verifyModal .modal-content");
+          if (!modalContent.querySelector(".modal-header")) {
+            const header = document.createElement("div");
+            header.className = "modal-header";
+            header.innerHTML = `
+              <h5 class="modal-title d-flex align-items-center">
+                  <span class="material-icons text-danger me-2">warning</span>
+                  <span>Important Notice</span>
+                </h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             `;
-
-            // ✅ Add close button dynamically
-            if (!modalHeader.querySelector(".btn-close")) {
-              const closeBtn = document.createElement("button");
-              closeBtn.type = "button";
-              closeBtn.className = "btn-close";
-              closeBtn.setAttribute("data-bs-dismiss", "modal");
-              modalHeader.appendChild(closeBtn);
-            }
-
-            // ✅ Render results table outside modal
-            resultsContainer.innerHTML = buildResultsTable(matches);
-          }, 1000);
-        },
-      });
+            modalContent.insertBefore(header, modalContent.firstChild);
+          }
+          modalEl.removeAttribute("data-bs-backdrop");
+          modalEl.removeAttribute("data-bs-keyboard");
+          resultsContainer.innerHTML = buildResultsTable(matches);
+        }, 1000);
+      },
+    });
   });
 
-  // ✅ Clear button logic
   clearValidationBtn.addEventListener("click", async () => {
+
+    resultsContainer.innerHTML = "Upload DI file and click validate to display matches";
+
     document.getElementById("diFile").value = "";
     mgIrtFile.value = "";
     document.getElementById("mgIrtCardHead").classList.remove("bg-primary");
     document.getElementById("mgIrtCardHead").classList.add("bg-secondary");
-    resultsContainer.innerHTML = "Upload DI file and click validate to display matches";
+
+    // ✅ Reload MG/IRT data from database and reset status
+    mgIrtData = await loadMgIrtDataFromSupabase();
+
   });
 
-  // ✅ Table builder
   function buildResultsTable(matches) {
     document.getElementById("mgIrtCardHead").classList.remove("bg-secondary");
     document.getElementById("mgIrtCardHead").classList.add("bg-primary");
 
     return `
-      <table class="table table-bordered table-striped mt-3">
-        <thead class="table-light">
-          <tr>
-            <th>Local Code (DI)</th>
-            <th>Name (DI)</th>
-            <th>Store Status</th>
-            <th>MG/IRT Account Name</th>
-            <th>MG Account ID</th>
-            <th>IRT Account ID</th>
-          </tr>
-        </thead>
+        <table class="table table-bordered table-striped mt-3">
+          <thead class="table-light">
+            <tr>
+              <th>Local Code (DI)</th>
+              <th>Name (DI)</th>
+              <th>Store Status</th>
+              <th>MG/IRT Account Name</th>
+              <th>MG Account ID</th>
+              <th>IRT Account ID</th>
+            </tr>
+          </thead>
         <tbody>
           ${
             matches.length
@@ -248,4 +253,5 @@ window.addEventListener("DOMContentLoaded", async () => {
       </table>
     `;
   }
-});
+
+}); 

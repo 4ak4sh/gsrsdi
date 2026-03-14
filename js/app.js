@@ -6,7 +6,7 @@ if (/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
       display:flex;
       justify-content:center;
       align-items:center;
-      height:100vh;
+      height:100vh; 
       font-family:sans-serif;
       text-align:center;
       padding:20px;

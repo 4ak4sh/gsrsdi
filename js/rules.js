@@ -19,6 +19,24 @@ function checkVerificationDate(row) {
   return { status: "PASS", rule: "Verification Date", message: "" };
 }
 
+function checkIncorrectStatus(row) {
+  const trade = (row["Local Trade Channel"] || "").trim();
+  const status = (row["Status"] || "").trim();
+
+  // ✅ Rule: If trade is [09] or [59], status must not be FO
+  if ((trade === "[09] Unknown Retailers" || trade === "[59] Unknown On-Premise") 
+      && status === "[FO] Future Opening") {
+    return {
+      status: "FAIL",
+      rule: "Incorrect Status",
+      message: `Trade ${trade} cannot have status ${status}`
+    };
+  }
+
+  return { status: "PASS", rule: "Incorrect Status", message: "" };
+}
+
+
 function checkVerificationSource(row) {
   const status = (row["Status"] || "").trim();
   const source = (row["Verification Source"] || "").trim();
@@ -150,28 +168,34 @@ function checkFoodType(row) {
   return { status: "PASS", rule: "Food Type", message: "" };
 }
 
-
-
 function checkPhone(row) {
   const status = row["Status"];
   const phone = row["Phone"];
   const trade = row["Local Trade Channel"];
-  if (trade === "[09] Unknown Retailers")
+
+  if (trade === "[09] Unknown Retailers") {
     return { status: "PASS", rule: "Phone", message: "" };
-  if (status === "[OP] Open, Operating" && isNull(phone))
+  }
+
+  if (status === "[OP] Open, Operating" && isNull(phone)) {
     return {
-      status: "FAIL",
+      status: "FAIL",   // 🔴 your table builder already maps FAIL → red
       rule: "Phone",
-      message: "Open TD must have a Ph#",
+      message: "Open TD must have a Ph#"
     };
-  if (status === "[FO] Future Opening" && isNull(phone))
+  }
+
+  if (status === "[FO] Future Opening" && isNull(phone)) {
     return {
-      status: "FAIL",
+      status: "WARN",   // 🟡 your table builder already maps WARN → yellow
       rule: "Phone",
-      message: "Please verify if Ph# is available",
+      message: "Please verify if Ph# is available"
     };
+  }
+
   return { status: "PASS", rule: "Phone", message: "" };
 }
+
 
 function checkAddress(row) {
   if (row["Address Quality"] === "Non Standardized")
@@ -422,6 +446,22 @@ function nullSupplier(row) {
       }
       break;
 
+      case "[01] Wholesale Clubs":
+      if (
+        isEmpty(grocerysupp) ||
+        isEmpty(confectionsupp) ||
+        isEmpty(gmsupp) ||
+        isEmpty(hbcsupp) ||
+        isEmpty(frozensupp)
+      ) {
+        return {
+          status: "FAIL",
+          rule: "Null Supplier",
+          message: "Wholesale Clubs require all supplier fields",
+        };
+      }
+      break;
+
     default:
       return { status: "PASS", rule: "Null Supplier", message: "" };
   }
@@ -439,6 +479,7 @@ function incorrectSupplier(row) {
   const irt = (row["IRT Local Code"] || "").trim();
   const mg = (row["MG Local Code"] || "").trim();
   const trade = (row["Local Trade Channel"] || "").trim();
+  const channel = (row["Local Sub Channel"] || "").trim();
 
   // Helper: check if any supplier field is populated
   const hasSupplier =
@@ -446,10 +487,15 @@ function incorrectSupplier(row) {
 
   // ✅ Allowed trades
   const allowedTrades = [
+    "[01] Wholesale Clubs",
+    "[05] Grocery Stores",
     "[07] Convenience Stores",
     "[08] Mass Merchandise Stores",
-    "[05] Grocery Stores",
+    "[11] Pet"
   ];
+
+  // ✅ Allowed sub‑channels for Pet
+  const allowedPetChannel = "[1] Pet Super Store";
 
   // --- Step 1: IRT/MG rule ---
   if (!irt && !mg) {
@@ -460,27 +506,173 @@ function incorrectSupplier(row) {
         message: "Suppliers must not be populated when both IRT and MG are empty",
       };
     }
-    // If no suppliers → PASS immediately
     return { status: "PASS", rule: "Incorrect Supplier", message: "" };
   }
 
-  // --- Step 2: Trade rule (only runs if Step 1 passed) ---
-  if (!allowedTrades.includes(trade) && hasSupplier) {
-    return {
-      status: "FAIL",
-      rule: "Incorrect Supplier",
-      message: `Trade ${trade} should not have supplier fields populated`,
-    };
+  // --- Step 2: Trade/Channel rule ---
+  if (trade === "[09] Pet Stores") {
+    if (channel !== "[1] Pet Super Store" && hasSupplier) {
+      return {
+        status: "FAIL",
+        rule: "Incorrect Supplier",
+        message: `Pet Stores with channel ${channel} should not have supplier fields populated`,
+      };
+    }
+  } else if (!allowedTrades.includes(trade) && hasSupplier) {
+      return {
+        status: "FAIL",
+        rule: "Incorrect Supplier",
+        message: `Trade ${trade} should not have supplier fields populated`,
+      };
+    }
+
+    return { status: "PASS", rule: "Incorrect Supplier", message: "" };
   }
 
-  // ✅ Otherwise → PASS
-  return { status: "PASS", rule: "Incorrect Supplier", message: "" };
+function getStateCode(stateField) {
+  const match = stateField.match(/\[(\w{2})\]/);
+  return match ? match[1] : null;
 }
+
+
+// BWL State Law
+// trade channels
+const tradeChannels = {
+  wholesale: "[01] Wholesale Clubs",
+  liq: "[02] Liquor, Wine and Beer Stores",
+  drug: "[03] Drug Stores and Pharmacies",
+  cigarette: "[04] Cigarette Stores",
+  grocery: "[05] Grocery Stores",
+  catkiller: "[06] Category Killers",
+  cstore: "[07] Convenience Stores",
+  mass: "[08] Mass Merchandise Stores",
+  cannabis: "[14] Cannabis"
+};
+
+// Restrictive states only
+const stateAlcoholRules = {
+  FL: {
+    beer: [tradeChannels.wholesale, tradeChannels.drug, tradeChannels.cigarette, tradeChannels.grocery, tradeChannels.catkiller, tradeChannels.cstore, tradeChannels.mass, tradeChannels.liq],
+    wine: [tradeChannels.wholesale, tradeChannels.drug, tradeChannels.cigarette, tradeChannels.grocery, tradeChannels.catkiller, tradeChannels.cstore, tradeChannels.mass, tradeChannels.liq],
+    liquor: [tradeChannels.liq, tradeChannels.grocery, tradeChannels.cigarette, tradeChannels.catkiller, tradeChannels.cstore],
+    twoDoor: true
+  },
+  TX: {
+    beer: [tradeChannels.wholesale, tradeChannels.drug, tradeChannels.cigarette, tradeChannels.grocery, tradeChannels.catkiller, tradeChannels.cstore, tradeChannels.mass, tradeChannels.liq],
+    wine: [tradeChannels.wholesale, tradeChannels.drug, tradeChannels.cigarette, tradeChannels.grocery, tradeChannels.catkiller, tradeChannels.cstore, tradeChannels.mass, tradeChannels.liq],
+    liquor: [tradeChannels.liq],
+    twoDoor: false
+  },
+  UT: {
+    beer: [tradeChannels.wholesale, tradeChannels.drug, tradeChannels.cigarette, tradeChannels.grocery, tradeChannels.cstore, tradeChannels.mass, tradeChannels.liq],
+    wine: [tradeChannels.liq],
+    liquor: [tradeChannels.liq],
+    twoDoor: false
+  },
+  PA: {
+    beer: [tradeChannels.grocery, tradeChannels.cstore],
+    wine: [tradeChannels.liq, tradeChannels.grocery],
+    liquor: [tradeChannels.liq],
+    twoDoor: true
+  },
+  NY: {
+    beer: [tradeChannels.grocery, tradeChannels.cstore],
+    wine: [tradeChannels.liq],
+    liquor: [tradeChannels.liq],
+    twoDoor: true
+  },
+  MS: {
+    beer: [tradeChannels.wholesale, tradeChannels.drug, tradeChannels.cigarette, tradeChannels.grocery, tradeChannels.cstore, tradeChannels.mass],
+    wine: [],
+    liquor: [],
+    twoDoor: true
+  },
+  SC: {
+    beer: [tradeChannels.wholesale, tradeChannels.drug, tradeChannels.cigarette, tradeChannels.grocery, tradeChannels.cstore, tradeChannels.mass],
+    wine: [tradeChannels.grocery, tradeChannels.cstore],
+    liquor: [tradeChannels.liq],
+    twoDoor: true
+  },
+  VT: {
+    beer: [tradeChannels.wholesale, tradeChannels.drug, tradeChannels.cigarette, tradeChannels.grocery, tradeChannels.cstore, tradeChannels.mass],
+    wine: [tradeChannels.grocery, tradeChannels.cstore],
+    liquor: [tradeChannels.liq],
+    twoDoor: true
+  },
+  TN: {
+    beer: [tradeChannels.wholesale, tradeChannels.drug, tradeChannels.cigarette, tradeChannels.grocery, tradeChannels.cstore, tradeChannels.mass],
+    wine: [tradeChannels.grocery, tradeChannels.cstore],
+    liquor: [tradeChannels.liq],
+    twoDoor: true
+  },
+  ME: {
+    beer: [tradeChannels.wholesale, tradeChannels.drug, tradeChannels.cigarette, tradeChannels.grocery, tradeChannels.cstore, tradeChannels.mass],
+    wine: [tradeChannels.grocery, tradeChannels.cstore],
+    liquor: [tradeChannels.liq],
+    twoDoor: true
+  },
+  OR: {
+    beer: [tradeChannels.wholesale, tradeChannels.drug, tradeChannels.cigarette, tradeChannels.grocery, tradeChannels.cstore, tradeChannels.mass],
+    wine: [tradeChannels.grocery, tradeChannels.cstore],
+    liquor: [tradeChannels.liq],
+    twoDoor: true
+  },
+  NH: {
+    beer: [tradeChannels.wholesale, tradeChannels.drug, tradeChannels.cigarette, tradeChannels.grocery, tradeChannels.cstore, tradeChannels.mass],
+    wine: [tradeChannels.liq],
+    liquor: [tradeChannels.liq],
+    twoDoor: true
+  },
+  NJ: {
+    beer: [tradeChannels.wholesale, tradeChannels.drug, tradeChannels.cigarette, tradeChannels.grocery, tradeChannels.cstore, tradeChannels.mass],
+    wine: [tradeChannels.grocery, tradeChannels.cstore],
+    liquor: [tradeChannels.liq],
+    twoDoor: true
+  },
+  VA: {
+    beer: [tradeChannels.wholesale, tradeChannels.drug, tradeChannels.cigarette, tradeChannels.grocery, tradeChannels.cstore, tradeChannels.mass],
+    wine: [tradeChannels.liq],
+    liquor: [tradeChannels.liq],
+    twoDoor: false
+  }
+};
+
+
+function checkStateAlcoholLaw(row) {
+  const stateCode = getStateCode(row["State"] || "");
+  const channel = (row["Local Trade Channel"] || "").toLowerCase();
+  const beerFlag = row["Beer"] === "[Y] Yes";
+  const wineFlag = row["Wine"] === "[Y] Yes";
+  const liquorFlag = row["Liquor"] === "[Y] Yes";
+
+  const rules = stateAlcoholRules[stateCode];
+  if (!rules) {
+    return { status: "PASS", rule: "State Alcohol Law", message: `No rules defined for ${stateCode}` };
+  }
+
+  let violations = [];
+  if (beerFlag && !rules.beer.includes(channel)) violations.push("Beer not allowed in this channel");
+  if (wineFlag && !rules.wine.includes(channel)) violations.push("Wine not allowed in this channel");
+  if (liquorFlag && !rules.liquor.includes(channel)) violations.push("Liquor not allowed in this channel");
+
+  if (violations.length > 0) {
+    return { status: "FAIL", rule: "State Alcohol Law", message: violations.join("; ") };
+  }
+
+  return {
+    status: "PASS",
+    rule: "State Alcohol Law",
+    message: rules.notes || ""
+  };
+}
+
+
 
 
 // Export rules
 const rules = [
   checkVerificationDate,
+  checkIncorrectStatus,
   checkVerificationSource,
   checkEmMgException,
   checkInactive,
@@ -492,5 +684,5 @@ const rules = [
   checkAddress,
   checkNameFormat,
   nullSupplier,
-  incorrectSupplier,
+  incorrectSupplier
 ];
