@@ -200,6 +200,11 @@ window.addEventListener("DOMContentLoaded", async () => {
           modalEl.removeAttribute("data-bs-backdrop");
           modalEl.removeAttribute("data-bs-keyboard");
           resultsContainer.innerHTML = buildResultsTable(matches);
+          // Update MG & IRT card header issue count
+          document.getElementById("mgIssueCount").innerHTML = `
+            <span class="material-icons-outlined me-1" style="font-size:20px;">error_outline</span>
+            <span>Total Matches: ${matches.length}</span>
+          `;
         }, 1000);
       },
     });
@@ -208,6 +213,8 @@ window.addEventListener("DOMContentLoaded", async () => {
   clearValidationBtn.addEventListener("click", async () => {
 
     resultsContainer.innerHTML = "Upload DI file and click validate to display matches";
+    document.getElementById("mgIssueCount").innerHTML = "";
+
 
     document.getElementById("diFile").value = "";
     mgIrtFile.value = "";

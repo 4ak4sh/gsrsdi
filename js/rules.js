@@ -527,143 +527,337 @@ function incorrectSupplier(row) {
     }
 
     return { status: "PASS", rule: "Incorrect Supplier", message: "" };
-  }
-
-function getStateCode(stateField) {
-  const match = stateField.match(/\[(\w{2})\]/);
-  return match ? match[1] : null;
 }
 
 
 // BWL State Law
 // trade channels
-const tradeChannels = {
-  wholesale: "[01] Wholesale Clubs",
-  liq: "[02] Liquor, Wine and Beer Stores",
-  drug: "[03] Drug Stores and Pharmacies",
-  cigarette: "[04] Cigarette Stores",
-  grocery: "[05] Grocery Stores",
-  catkiller: "[06] Category Killers",
-  cstore: "[07] Convenience Stores",
-  mass: "[08] Mass Merchandise Stores",
-  cannabis: "[14] Cannabis"
-};
+
+const wholesale = "[01] Wholesale Clubs"
+const liq = "[02] Liquor, Wine and Beer Stores"
+const drug = "[03] Drug Stores and Pharmacies"
+const cigarette = "[04] Cigarette Stores"
+const grocery = "[05] Grocery Stores"
+const catkiller = "[06] Category Killers"
+const cstore = "[07] Convenience Stores"
+const mass = "[08] Mass Merchandise Stores"
+const cannabis = "[14] Cannabis"
+
 
 // Restrictive states only
 const stateAlcoholRules = {
-  FL: {
-    beer: [tradeChannels.wholesale, tradeChannels.drug, tradeChannels.cigarette, tradeChannels.grocery, tradeChannels.catkiller, tradeChannels.cstore, tradeChannels.mass, tradeChannels.liq],
-    wine: [tradeChannels.wholesale, tradeChannels.drug, tradeChannels.cigarette, tradeChannels.grocery, tradeChannels.catkiller, tradeChannels.cstore, tradeChannels.mass, tradeChannels.liq],
-    liquor: [tradeChannels.liq, tradeChannels.grocery, tradeChannels.cigarette, tradeChannels.catkiller, tradeChannels.cstore],
-    twoDoor: true
-  },
-  TX: {
-    beer: [tradeChannels.wholesale, tradeChannels.drug, tradeChannels.cigarette, tradeChannels.grocery, tradeChannels.catkiller, tradeChannels.cstore, tradeChannels.mass, tradeChannels.liq],
-    wine: [tradeChannels.wholesale, tradeChannels.drug, tradeChannels.cigarette, tradeChannels.grocery, tradeChannels.catkiller, tradeChannels.cstore, tradeChannels.mass, tradeChannels.liq],
-    liquor: [tradeChannels.liq],
-    twoDoor: false
-  },
-  UT: {
-    beer: [tradeChannels.wholesale, tradeChannels.drug, tradeChannels.cigarette, tradeChannels.grocery, tradeChannels.cstore, tradeChannels.mass, tradeChannels.liq],
-    wine: [tradeChannels.liq],
-    liquor: [tradeChannels.liq],
-    twoDoor: false
-  },
-  PA: {
-    beer: [tradeChannels.grocery, tradeChannels.cstore],
-    wine: [tradeChannels.liq, tradeChannels.grocery],
-    liquor: [tradeChannels.liq],
-    twoDoor: true
-  },
-  NY: {
-    beer: [tradeChannels.grocery, tradeChannels.cstore],
-    wine: [tradeChannels.liq],
-    liquor: [tradeChannels.liq],
-    twoDoor: true
-  },
-  MS: {
-    beer: [tradeChannels.wholesale, tradeChannels.drug, tradeChannels.cigarette, tradeChannels.grocery, tradeChannels.cstore, tradeChannels.mass],
-    wine: [],
-    liquor: [],
-    twoDoor: true
-  },
-  SC: {
-    beer: [tradeChannels.wholesale, tradeChannels.drug, tradeChannels.cigarette, tradeChannels.grocery, tradeChannels.cstore, tradeChannels.mass],
-    wine: [tradeChannels.grocery, tradeChannels.cstore],
-    liquor: [tradeChannels.liq],
-    twoDoor: true
-  },
-  VT: {
-    beer: [tradeChannels.wholesale, tradeChannels.drug, tradeChannels.cigarette, tradeChannels.grocery, tradeChannels.cstore, tradeChannels.mass],
-    wine: [tradeChannels.grocery, tradeChannels.cstore],
-    liquor: [tradeChannels.liq],
-    twoDoor: true
-  },
-  TN: {
-    beer: [tradeChannels.wholesale, tradeChannels.drug, tradeChannels.cigarette, tradeChannels.grocery, tradeChannels.cstore, tradeChannels.mass],
-    wine: [tradeChannels.grocery, tradeChannels.cstore],
-    liquor: [tradeChannels.liq],
-    twoDoor: true
-  },
-  ME: {
-    beer: [tradeChannels.wholesale, tradeChannels.drug, tradeChannels.cigarette, tradeChannels.grocery, tradeChannels.cstore, tradeChannels.mass],
-    wine: [tradeChannels.grocery, tradeChannels.cstore],
-    liquor: [tradeChannels.liq],
-    twoDoor: true
-  },
-  OR: {
-    beer: [tradeChannels.wholesale, tradeChannels.drug, tradeChannels.cigarette, tradeChannels.grocery, tradeChannels.cstore, tradeChannels.mass],
-    wine: [tradeChannels.grocery, tradeChannels.cstore],
-    liquor: [tradeChannels.liq],
-    twoDoor: true
-  },
-  NH: {
-    beer: [tradeChannels.wholesale, tradeChannels.drug, tradeChannels.cigarette, tradeChannels.grocery, tradeChannels.cstore, tradeChannels.mass],
-    wine: [tradeChannels.liq],
-    liquor: [tradeChannels.liq],
-    twoDoor: true
-  },
-  NJ: {
-    beer: [tradeChannels.wholesale, tradeChannels.drug, tradeChannels.cigarette, tradeChannels.grocery, tradeChannels.cstore, tradeChannels.mass],
-    wine: [tradeChannels.grocery, tradeChannels.cstore],
-    liquor: [tradeChannels.liq],
-    twoDoor: true
-  },
-  VA: {
-    beer: [tradeChannels.wholesale, tradeChannels.drug, tradeChannels.cigarette, tradeChannels.grocery, tradeChannels.cstore, tradeChannels.mass],
-    wine: [tradeChannels.liq],
-    liquor: [tradeChannels.liq],
-    twoDoor: false
-  }
+AK: {
+    beer: [liq],
+    wine: [liq],
+    liquor: [liq]
+},
+
+AL: {
+    beer: [wholesale, drug, cigarette, grocery, catkiller, cstore, mass, liq],
+    wine: [wholesale, drug, cigarette, grocery, catkiller, cstore, mass, liq],
+    liquor: [liq]
+},
+
+AR: {
+    beer: [wholesale, drug, cigarette, grocery, catkiller, cstore, mass, liq],
+    wine: [cigarette, grocery, cstore, mass, liq],
+    liquor: [cigarette, liq]
+},
+
+CO: {
+    beer: [wholesale, drug, cigarette, grocery, catkiller, cstore, mass, liq],
+    wine: [wholesale, drug, cigarette, grocery, catkiller, cstore, mass, liq],
+    liquor: [grocery,drug, liq]
+},
+
+CT: {
+    beer: [wholesale, drug, cstore, grocery, liq],
+    wine: [drug, liq],
+    liquor: [drug, liq]
+},
+
+DC: {
+    beer: [wholesale, drug, grocery, catkiller, cstore, mass, liq],
+    wine: [wholesale, drug, grocery, catkiller, cstore, mass, liq],
+    liquor: [wholesale, liq]
+},
+
+DE: {
+    beer: [liq],
+    wine: [liq],
+    liquor: [liq]
+},
+
+FL: {
+    beer: [wholesale, drug, cigarette, grocery, catkiller, cstore, mass, liq],
+    wine: [wholesale, drug, cigarette, grocery, catkiller, cstore, mass, liq],
+    liquor: [cigarette, grocery, catkiller, cstore, liq]
+},
+
+GA: {
+    beer: [wholesale, drug, cigarette, grocery, catkiller, cstore, mass, liq],
+    wine: [wholesale, drug, cigarette, grocery, catkiller, cstore, mass, liq],
+    liquor: [liq]
+},
+
+HI: {
+  beer: [wholesale, drug, grocery, catkiller, cstore, mass, liq],
+  wine: [wholesale, drug, grocery, catkiller, cstore, mass, liq],
+  liquor: [wholesale, drug, grocery, cstore, mass, liq]
+},
+
+// IA: {
+//     beer: [wholesale, drug, cigarette, grocery, catkiller, cstore, mass, liq],
+//     wine: [wholesale, drug, cigarette, grocery, catkiller, cstore, mass, liq],
+//     liquor: [wholesale, drug, cigarette, grocery, cstore, mass, liq]
+// },
+
+ID: {
+    beer: [wholesale, drug, cigarette, grocery, catkiller, cstore, mass, liq],
+    wine: [wholesale, drug, cigarette, grocery, catkiller, cstore, mass, liq],
+    liquor: [cstore, liq]
+},
+
+IN: {
+    beer: [wholesale, drug, cigarette, grocery, catkiller, cstore, mass, liq],
+    wine: [wholesale, drug, cigarette, grocery, catkiller, cstore, mass, liq],
+    liquor: [wholesale, drug, cigarette, grocery, cstore, mass, liq]
+},
+
+KS: {
+    beer: [wholesale, drug, cigarette, grocery, cstore, mass, liq],
+    wine: [liq, cigarette],
+    liquor: [liq, cigarette]
+},
+
+KY: {
+    beer: [wholesale, drug, cigarette, grocery, catkiller, cstore, mass, liq],
+    wine: [wholesale, drug, cigarette, catkiller, liq, mass],
+    liquor: [drug, cigarette, liq]
+},
+
+MA: {
+    beer: [wholesale, drug, cigarette, grocery, catkiller, cstore, mass, liq],
+    wine: [wholesale, drug, cigarette, grocery, catkiller, cstore, mass, liq],
+    liquor: [wholesale, drug, cigarette, grocery, cstore, mass, liq]
+},
+
+MD: {
+    beer: [wholesale, drug, cigarette, grocery, mass, liq],
+    wine: [wholesale, drug, cigarette, grocery, mass, liq],
+    liquor: [wholesale, drug, cigarette, grocery, mass, liq]
+},
+
+ME: {
+    beer: [wholesale, drug, cigarette, grocery, catkiller, cstore, mass, liq],
+    wine: [wholesale, drug, cigarette, grocery, catkiller, cstore, mass, liq],
+    liquor: [drug, cigarette, grocery, cstore, liq]
+},
+
+MN: {
+    beer: [wholesale, drug, cigarette, grocery, catkiller, cstore, mass, liq],
+    wine: [cigarette, catkiller, liq],
+    liquor: [liq, cigarette]  
+},
+
+MO: {
+    beer: [wholesale, drug, cigarette, grocery, catkiller, cstore, mass, liq],
+    wine: [wholesale, drug, cigarette, grocery, catkiller, cstore, mass, liq],
+    liquor: [wholesale, drug, cigarette, grocery, cstore, catkiller, liq]
+},
+
+MS: {
+    beer: [wholesale, drug, cigarette, grocery, catkiller, cstore, mass, liq],
+    wine: [liq, drug, cigarette, catkiller],
+    liquor: [liq, cigarette]
+},
+
+MT: {
+    beer: [wholesale, drug, cigarette, grocery, catkiller, cstore, mass, liq],
+    wine: [wholesale, drug, grocery, catkiller, cstore, mass, liq],
+    liquor: [liq]
+},
+
+NC: {
+    beer: [wholesale, drug, cigarette, grocery, catkiller, cstore, mass, liq],
+    wine: [wholesale, drug, cigarette, grocery, catkiller, cstore, mass, liq],
+    liquor: [liq]
+},
+
+ND: {
+    beer: [wholesale, grocery, catkiller, cstore, mass, liq],
+    wine: [wholesale, grocery, cstore, mass, liq],
+    liquor: [wholesale, grocery, cstore, liq]
+},
+
+// NE: {
+//     beer: [wholesale, drug, cigarette, grocery, catkiller, cstore, mass, liq],
+//     wine: [wholesale, drug, cigarette, grocery, catkiller, cstore, mass, liq],
+//     liquor: [drug, grocery, catkiller, cstore, mass, liq]   
+// },
+
+NH: {
+    beer: [wholesale, drug, cigarette, grocery, catkiller, cstore, mass, liq],
+    wine: [wholesale, drug, cigarette, grocery, catkiller, cstore, mass, liq],
+    liquor: [liq]
+},
+
+NJ: {
+    beer: [wholesale, drug, cigarette, grocery, cstore, mass, liq],
+    wine: [wholesale, drug, cigarette, grocery, cstore, mass, liq],
+    liquor: [wholesale, drug, cigarette, grocery, cstore, mass, liq]
+},
+
+NM: {
+  beer:[wholesale, drug, grocery, catkiller, cstore, mass, liq],
+  wine:[wholesale, drug, grocery, catkiller, cstore, mass, liq],
+  liquor: [wholesale, drug, grocery, catkiller, cstore, mass, liq]
+},
+
+NY: {
+    beer: [drug, cigarette, grocery, catkiller, cstore, mass, liq],
+    wine: [liq, cigarette, grocery, cstore],
+    liquor: [liq]
+},
+
+// OH: {
+//     beer: [wholesale, drug, cigarette, grocery, catkiller, cstore, mass, liq],
+//     wine: [wholesale, drug, cigarette, grocery, catkiller, cstore, mass, liq],
+//     liquor: [wholesale, drug, cigarette, grocery, catkiller, cstore, mass, liq]
+// },
+
+OK: {
+    beer: [wholesale, drug, cigarette, grocery, catkiller, cstore, mass, liq],
+    wine: [wholesale, drug, cigarette, grocery, cstore, mass, liq],
+    liquor: [liq]
+},
+
+OR: {
+    beer: [wholesale, drug, cigarette, grocery, catkiller, cstore, mass, liq],
+    wine: [wholesale, drug, cigarette, grocery, catkiller, cstore, mass, liq],
+    liquor: [liq]
+},
+
+PA: {
+    beer: [liq],
+    wine: [liq],
+    liquor: [liq]
+},
+
+RI: {
+    beer: [liq],
+    wine: [liq],
+    liquor: [liq]
+},
+
+SC: {
+    beer: [wholesale, drug, cigarette, grocery, catkiller, cstore, mass, liq],
+    wine: [wholesale, drug, cigarette, grocery, catkiller, cstore, mass, liq],
+    liquor: [cstore, cigarette, liq]
+},
+
+TN: {
+    beer: [wholesale, drug, cigarette, grocery, catkiller, cstore, mass, liq],
+    wine: [wholesale, cigarette, grocery, catkiller, cstore, mass, liq],
+    liquor: [liq]
+},
+
+TX: {
+    beer: [wholesale, drug, cigarette, grocery, catkiller, cstore, mass, liq],
+    wine: [wholesale, drug, cigarette, grocery, catkiller, cstore, mass, liq],
+    liquor: [liq]
+},
+
+UT: {
+    beer: [wholesale, drug, cigarette, grocery, cstore, mass, liq],
+    wine: [liq],
+    liquor: [liq]
+},
+
+VA: {
+    beer: [wholesale, drug, cigarette, grocery, catkiller, cstore, mass, liq],
+    wine: [wholesale, drug, cigarette, grocery, catkiller, cstore, mass, liq],
+    liquor: [cstore, liq]
+},
+
+VT: {
+    beer: [wholesale, drug, cigarette, grocery, catkiller, cstore, mass, liq],
+    wine: [wholesale, drug, cigarette, grocery, catkiller, cstore, mass, liq],
+    liquor: [liq]
+},
+
+WV: {
+    beer: [wholesale, drug, cigarette, grocery, catkiller, cstore, mass, liq],
+    wine: [wholesale, drug, cigarette, grocery, catkiller, cstore, mass, liq],
+    liquor: [wholesale, drug, cigarette, grocery, cstore, liq]
+},
+
+WY: {
+    beer: [wholesale, drug, cigarette, grocery, cstore, mass, liq],
+    wine: [wholesale, drug, cigarette, grocery, cstore, mass, liq],
+    liquor: [wholesale, drug, cigarette, grocery, cstore, mass, liq]
+}
 };
 
 
 function checkStateAlcoholLaw(row) {
-  const stateCode = getStateCode(row["State"] || "");
-  const channel = (row["Local Trade Channel"] || "").toLowerCase();
+  function getStateCode(stateField) {
+    const match = (stateField || "").match(/\[(\w{2})\]/);
+    return match ? match[1] : null;
+  }
+
+  const stateCode = getStateCode(row["State"]);
+  const channel = (row["Local Trade Channel"] || "").trim();
   const beerFlag = row["Beer"] === "[Y] Yes";
   const wineFlag = row["Wine"] === "[Y] Yes";
   const liquorFlag = row["Liquor"] === "[Y] Yes";
 
+  // ✅ Only check these trades
+  const tradesToCheck = [
+    "[01] Wholesale Clubs",
+    "[02] Liquor, Wine and Beer Stores",
+    "[03] Drug Stores and Pharmacies",
+    "[04] Cigarette Stores",
+    "[05] Grocery Stores",
+    "[06] Category Killers",
+    "[07] Convenience Stores",
+    "[08] Mass Merchandise Stores",
+    "[14] Cannabis"
+  ];
+
+  if (!tradesToCheck.includes(channel)) {
+    return { status: "PASS", rule: "BWL State Law", message: "Trade not subject to alcohol law check" };
+  }
+
+  if (!stateCode) {
+    return { status: "PASS", rule: "BWL State Law", message: "No state code found" };
+  }
+
   const rules = stateAlcoholRules[stateCode];
   if (!rules) {
-    return { status: "PASS", rule: "State Alcohol Law", message: `No rules defined for ${stateCode}` };
+    return { status: "PASS", rule: "BWL State Law", message: `No rules defined for ${stateCode}` };
   }
 
   let violations = [];
-  if (beerFlag && !rules.beer.includes(channel)) violations.push("Beer not allowed in this channel");
-  if (wineFlag && !rules.wine.includes(channel)) violations.push("Wine not allowed in this channel");
-  if (liquorFlag && !rules.liquor.includes(channel)) violations.push("Liquor not allowed in this channel");
-
-  if (violations.length > 0) {
-    return { status: "FAIL", rule: "State Alcohol Law", message: violations.join("; ") };
+  if (beerFlag && !rules.beer.includes(channel)) {
+    violations.push(`Beer not allowed in ${channel} for ${stateCode}`);
+  }
+  if (wineFlag && !rules.wine.includes(channel)) {
+    violations.push(`Wine not allowed in ${channel} for ${stateCode}`);
+  }
+  if (liquorFlag && !rules.liquor.includes(channel)) {
+    violations.push(`Liquor not allowed in ${channel} for ${stateCode}`);
   }
 
-  return {
-    status: "PASS",
-    rule: "State Alcohol Law",
-    message: rules.notes || ""
-  };
+  if (violations.length > 0) {
+    return {
+      status: "FAIL",
+      rule: "BWL State Law",
+      message: violations.join("; ")
+    };
+  }
+
+  return { status: "PASS", rule: "BWL State Law", message: "" };
 }
 
 
@@ -684,5 +878,6 @@ const rules = [
   checkAddress,
   checkNameFormat,
   nullSupplier,
-  incorrectSupplier
+  incorrectSupplier,
+  checkStateAlcoholLaw
 ];

@@ -174,7 +174,13 @@ document.getElementById("csvFile").addEventListener("change", function (e) {
       let totalIssues = defectLogs.length;
 
       // Update status bar with icon + text
-      document.getElementById("issueCount").innerHTML = `
+      // document.getElementById("issueCount").innerHTML = `
+      //   <span class="material-icons-outlined me-1" style="font-size:20px;">error_outline</span>
+      //   <span>Total Issues: ${totalIssues}</span>
+      // `;
+
+      // Update card header (right side)
+      document.getElementById("diIssueCount").innerHTML = `
         <span class="material-icons-outlined me-1" style="font-size:20px;">error_outline</span>
         <span>Total Issues: ${totalIssues}</span>
       `;
@@ -378,10 +384,12 @@ document.getElementById("clearBtn").addEventListener("click", function () {
   document.getElementById("results").innerHTML = "Upload DI file to display defects";
 
   // Reset status bar text back to upload prompt
-  document.getElementById("issueCount").innerHTML = `
-    <span class="material-icons-outlined me-1" style="font-size:20px;">upload_file</span>
-    <span>Upload DI file (CSV)</span>
-  `;
+  // document.getElementById("issueCount").innerHTML = `
+  //   <span class="material-icons-outlined me-1" style="font-size:20px;">upload_file</span>
+  //   <span>Upload DI file (CSV)</span>
+  // `;
+
+  document.getElementById("diIssueCount").innerHTML = "";
 
   // Reset global storage
   defectLogs = [];
