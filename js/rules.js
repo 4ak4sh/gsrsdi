@@ -381,6 +381,46 @@ function checkNameFormat(row) {
   return { status: "PASS", rule: "Name Format", message: "" };
 }
 
+
+function nullStoreNumber(row) {
+  const irt = (row["IRT Local Code"] || "").trim();
+  const mg = (row["MG Local Code"] || "").trim();
+  const storeNum = (row["Store Number"] || "").trim();
+
+  // Case 1: Store Number is all zeros → FAIL (always)
+  if (/^0+$/.test(storeNum)) {
+    return {
+      status: "FAIL",
+      rule: "Store Number",
+      message: "Store Number cannot be all zeros"
+    };
+  }
+
+  // Case 2: Both MG and IRT are missing
+  if (!mg && !irt) {
+    if (!storeNum) {
+      // No MG/IRT and no store number → PASS
+      return { status: "PASS", rule: "Store Number", message: "" };
+    } else {
+      // No MG/IRT but store number present → PASS (optional, depends on business rules)
+      return { status: "PASS", rule: "Store Number", message: "" };
+    }
+  }
+
+  // Case 3: MG/IRT exists but Store Number is empty → FAIL
+  if (!storeNum) {
+    return {
+      status: "FAIL",
+      rule: "Store Number",
+      message: "Store Number is missing while MG or IRT code is present"
+    };
+  }
+
+  // Case 4: MG/IRT exists and Store Number is valid → PASS
+  return { status: "PASS", rule: "Store Number", message: "" };
+}
+
+
 // supplier list - c-store = Grocery Supplier & Confection Supplier || mass merchandise = Grocery supplier, confection supplier, GM supplier and HBC Supplier ||
 // Grocery = all suppliers
 
@@ -877,6 +917,7 @@ const rules = [
   checkAddressRules,
   checkAddress,
   checkNameFormat,
+  nullStoreNumber,
   nullSupplier,
   incorrectSupplier,
   checkStateAlcoholLaw

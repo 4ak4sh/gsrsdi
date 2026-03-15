@@ -152,7 +152,7 @@ window.addEventListener("DOMContentLoaded", async () => {
 
           if (!mgLocalCodeNorm && !irtLocalCode && diNameNorm && mgMapByName.has(diNameNorm)) {
             const mgRow = mgMapByName.get(diNameNorm);
-            if (mgRow["ACC_IMMEDIATE_REPORT_TO"]) {
+            if (mgRow) {
               matches.push({
                 diId: diRow["Local Code"],
                 diName,
@@ -177,7 +177,20 @@ window.addEventListener("DOMContentLoaded", async () => {
                 irtId: mgRow["ACC_IMMEDIATE_REPORT_TO"],
               });
             }
-          }
+          } else if (!mgLocalCodeNorm && irtLocalCode) {
+              const mgRowByName = mgMapByName.get(diNameNorm);
+              if (mgRowByName) {
+                matches.push({
+                  diId: diRow["Local Code"],
+                  diName,
+                  diStatus: diRow["Status"],
+                  mgName: mgRowByName["ACCOUNT_NAME"] || "Missing MG",
+                  mgId: mgRowByName["TDLINX_ACCOUNT_CODE"] || "Missing MG",
+                  irtId: irtLocalCode
+                });
+              }
+            }
+
         });
 
         setTimeout(() => {

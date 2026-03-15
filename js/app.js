@@ -205,6 +205,8 @@ document.getElementById("csvFile").addEventListener("change", function (e) {
           extraHeaders = "<th>Verification Date</th>";
         } else if (ruleName === "Verification Source") {
           extraHeaders = "<th>Verification Source</th>";
+        } else if (ruleName === "Store Number") {
+          extraHeaders = "<th>Store Number</th>";
         }
 
         content += `
@@ -244,6 +246,8 @@ document.getElementById("csvFile").addEventListener("change", function (e) {
             extraCells = `<td>${r["Verification Date"] || ""}</td>`;
           } else if (ruleName === "Verification Source") {
             extraCells = `<td>${r["Verification Source"] || ""}</td>`;
+          } else if (ruleName === "Store Number") {
+            extraCells = `<td>${r["Store Number"] || ""}</td>`;
           }
 
           content += `<tr class="${statusClass}">
