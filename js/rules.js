@@ -589,19 +589,22 @@ const stateAlcoholRules = {
 AK: {
     beer: [liq],
     wine: [liq],
-    liquor: [liq]
+    liquor: [liq],
+    cannabis: "Combination"
 },
 
 AL: {
     beer: [wholesale, drug, cigarette, grocery, catkiller, cstore, mass, liq],
     wine: [wholesale, drug, cigarette, grocery, catkiller, cstore, mass, liq],
-    liquor: [liq]
+    liquor: [liq],
+    cannabis: "Medical"
 },
 
 AR: {
     beer: [wholesale, drug, cigarette, grocery, catkiller, cstore, mass, liq],
     wine: [cigarette, grocery, cstore, mass, liq],
-    liquor: [cigarette, liq]
+    liquor: [cigarette, liq],
+    cannabis: "Medical"
 },
 
 CO: {
@@ -900,6 +903,76 @@ function checkStateAlcoholLaw(row) {
   return { status: "PASS", rule: "BWL State Law", message: "" };
 }
 
+const stateCannabisRules = {
+  AK: "Combination", AL: "Medical", AR: "Medical", AZ: "Combination", CA: "Combination",
+  CO: "Combination", CT: "Combination", DC: "Medical", DE: "Medical", FL: "Medical",
+  GA: "No", HI: "Medical", IA: "Medical", ID: "No", IL: "Combination",
+  IN: "No", KS: "No", KY: "No", LA: "Medical", MA: "Combination",
+  MD: "Combination", ME: "Combination", MI: "Combination", MN: "Combination", MO: "Combination",
+  MS: "Medical", MT: "Combination", NC: "No", ND: "Medical", NE: "No",
+  NH: "Medical", NJ: "Combination", NM: "Combination", NV: "Combination", NY: "Combination",
+  OH: "Combination", OK: "Medical", OR: "Combination", PA: "Medical", RI: "Combination",
+  SC: "No", SD: "Medical", TN: "No", TX: "Medical", UT: "Medical",
+  VA: "Medical", VT: "Combination", WA: "Combination", WI: "No", WV: "Medical",
+  WY: "No"
+};
+
+// Check Cannabis State Law
+function checkCannabisSubChannel(row) {
+  // Helper: extract state code from "[XX] StateName"
+  function getStateCode(stateField) {
+    const match = (stateField || "").match(/\[(\w{2})\]/);
+    return match ? match[1] : null;
+  }
+
+  const stateCode = getStateCode(row["State"]);
+  const channel = (row["Local Trade Channel"] || "").trim();
+  let subChannel = (row["Local Sub Channel"] || "").trim();
+
+  // ✅ Only run cannabis check if channel is [14] Cannabis
+  if (channel !== "[14] Cannabis") {
+    return { status: "PASS", rule: "Cannabis State Law", message: "" };
+  }
+
+  if (!stateCode) {
+    return { status: "PASS", rule: "Cannabis State Law", message: "" };
+  }
+
+  const expectedRule = stateCannabisRules[stateCode];
+  if (!expectedRule) {
+    return { status: "PASS", rule: "Cannabis State Law", message: "" };
+  }
+
+  // 🔑 Normalize DI value (remove [number] prefix like "[2] Recreational")
+  subChannel = subChannel.replace(/^\[\d+\]\s*/, "");
+
+  // Special case: Combination states allow Medical, Recreational, or Combination
+  if (expectedRule === "Combination" &&
+      (subChannel === "Medical" || subChannel === "Recreational" || subChannel === "Combination")) {
+    return {
+      status: "PASS",
+      rule: "Cannabis State Law",
+      message: ""
+    };
+  }
+
+  // Standard comparison for other states
+  if (subChannel !== expectedRule) {
+    const msg = expectedRule === "No"
+      ? `${stateCode} does not allow cannabis, but found ${subChannel.toLowerCase()}`
+      : `${stateCode} allows only ${expectedRule.toLowerCase()}, found ${subChannel.toLowerCase()}`;
+    return { status: "FAIL", rule: "Cannabis State Law", message: msg };
+  }
+
+  return {
+    status: "PASS",
+    rule: "Cannabis State Law",
+    message: ""
+  };
+}
+
+
+
 
 
 
@@ -920,5 +993,6 @@ const rules = [
   nullStoreNumber,
   nullSupplier,
   incorrectSupplier,
-  checkStateAlcoholLaw
+  checkStateAlcoholLaw,
+  checkCannabisSubChannel
 ];
